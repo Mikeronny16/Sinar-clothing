@@ -43,9 +43,9 @@ export default function SizeGuide({ open, onClose }: Props) {
   const { t, lang } = useLang()
   const { isDark } = useTheme()
 
-  const bgModal = isDark ? "bg-[#0F2415]" : "bg-[#FAF7F2]"
+  const bgModal = isDark ? "bg-[#0F2415]" : "bg-[#FAF6EF]"
   const border = isDark ? "border-[rgba(255,255,255,0.08)]" : "border-[rgba(45,90,61,0.12)]"
-  const textMain = isDark ? "text-[#F5F0E8]" : "text-[#1A2E1F]"
+  const textMain = isDark ? "text-[#F5F0E8]" : "text-[#16301F]"
   const textMuted = isDark ? "text-[#7A8F7D]" : "text-[#3D5A45]"
   const thBg = isDark ? "bg-[#122B19]" : "bg-[#F2EDE4]"
   const trHover = isDark ? "hover:bg-[#122B19]" : "hover:bg-[#F2EDE4]"

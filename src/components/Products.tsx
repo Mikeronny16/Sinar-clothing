@@ -1,13 +1,14 @@
-import { useMemo, useState } from "react"
+import { useMemo, useRef, useState } from "react"
+import { Link } from "react-router-dom"
 import { useQuery } from "@tanstack/react-query"
 import { motion } from "framer-motion"
 import { supabase, isConfigured, type Product } from "@/lib/supabase"
 import { FALLBACK_PRODUCTS, type Category } from "@/lib/products"
 import ProductCard from "./ProductCard"
-import QuickViewModal from "./QuickViewModal"
 import OrderInstructions from "./OrderInstructions"
 import SizeGuide from "./SizeGuide"
-import { HelpCircle, Ruler, Search, X } from "lucide-react"
+import { BotanicalDivider } from "./Botanical"
+import { HelpCircle, Ruler, Search, X, ArrowLeft, ArrowRight } from "lucide-react"
 import { useLang } from "@/lib/lang"
 import { useTheme } from "@/lib/theme"
 
@@ -25,13 +26,20 @@ const FILTERS: { key: Filter; mm: string; en: string }[] = [
 
 export default function Products() {
   const [filter, setFilter] = useState<Filter>("All")
-  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null)
   const [showInstructions, setShowInstructions] = useState(false)
   const [showSizeGuide, setShowSizeGuide] = useState(false)
   const [search, setSearch] = useState("")
   const [sortBy, setSortBy] = useState<SortOption>("default")
   const { t, lang } = useLang()
   const { isDark } = useTheme()
+  const railRef = useRef<HTMLDivElement>(null)
+
+  const scrollRail = (dir: -1 | 1) => {
+    const rail = railRef.current
+    if (!rail) return
+    const amount = Math.min(rail.clientWidth * 0.9, 640)
+    rail.scrollBy({ left: dir * amount, behavior: "smooth" })
+  }
 
   const { data: live } = useQuery({
     queryKey: ["products"],
@@ -60,15 +68,25 @@ export default function Products() {
     return result
   }, [filter, all, search, sortBy])
 
-  const bgSection = isDark ? "bg-[#0A1A0F]" : "bg-[#FAF7F2]"
-  const textMain = isDark ? "text-[#F5F0E8]" : "text-[#1A2E1F]"
+  const bgSection = isDark ? "bg-[#0A1A0F]" : "bg-[#FAF6EF]"
+  const textMain = isDark ? "text-[#F5F0E8]" : "text-[#16301F]"
   const textMuted = isDark ? "text-[#7A8F7D]" : "text-[#3D5A45]"
   const filterBg = isDark ? "bg-[#0F2415] border-[rgba(255,255,255,0.06)]" : "bg-white border-[rgba(45,90,61,0.10)]"
-  const filterBtn = isDark ? "text-[#7A8F7D] hover:text-[#F5F0E8]" : "text-[#3D5A45] hover:text-[#1A2E1F]"
+  const filterBtn = isDark ? "text-[#7A8F7D] hover:text-[#F5F0E8]" : "text-[#3D5A45] hover:text-[#16301F]"
 
   return (
-    <section id="shop" className={`py-24 lg:py-36 ${bgSection} grain-texture`}>
+    <section id="shop" className={`py-24 lg:py-36 ${bgSection}`}>
       <div className="max-w-7xl mx-auto px-5 sm:px-8">
+
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+          className="mb-12"
+        >
+          <BotanicalDivider />
+        </motion.div>
 
         {/* Editorial header — left-aligned on desktop */}
         <div className="mb-14 lg:flex lg:items-end lg:justify-between lg:gap-8">
@@ -164,7 +182,7 @@ export default function Products() {
               className={`w-full pl-9 pr-8 py-2.5 rounded-full text-sm outline-none border transition-colors font-mm ${
                 isDark
                   ? "bg-[#0F2415] border-[rgba(255,255,255,0.08)] text-[#F5F0E8] placeholder:text-[#7A8F7D] focus:border-pink/40"
-                  : "bg-white border-[rgba(45,90,61,0.12)] text-[#1A2E1F] placeholder:text-[#3D5A45] focus:border-pink/40"
+                  : "bg-white border-[rgba(45,90,61,0.12)] text-[#16301F] placeholder:text-[#3D5A45] focus:border-pink/40"
               }`}
             />
             {search && (
@@ -181,7 +199,7 @@ export default function Products() {
             className={`px-4 py-2.5 rounded-full text-xs border outline-none cursor-pointer transition-colors ${
               isDark
                 ? "bg-[#0F2415] border-[rgba(255,255,255,0.08)] text-[#F5F0E8]"
-                : "bg-white border-[rgba(45,90,61,0.12)] text-[#1A2E1F]"
+                : "bg-white border-[rgba(45,90,61,0.12)] text-[#16301F]"
             }`}
           >
             <option value="default">{t("မူလစဉ်", "Default")}</option>
@@ -230,18 +248,50 @@ export default function Products() {
           </div>
         </motion.div>
 
-        {/* Editorial masonry-ish grid */}
+        {/* Horizontal carousel with circle-arrow nav (Joy Rush style) */}
         {items.length > 0 ? (
-          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-            {items.map((p, i) => (
-              <ProductCard
-                key={p.id}
-                p={p}
-                index={i}
-                onQuickView={setQuickViewProduct}
-                large={i === 0}
-              />
-            ))}
+          <div className="relative">
+            {/* Arrow controls */}
+            <div className="mb-5 flex items-center justify-between">
+              <p className={`editorial-label text-[10px] ${textMuted}`}>
+                {t("ဘေးတိုက် ဆွဲကြည့်ပါ", "Drag or use arrows →")}
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => scrollRail(-1)}
+                  aria-label="Previous"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-plum/20 text-plum transition-colors hover:bg-coral hover:border-coral hover:text-cream"
+                >
+                  <ArrowLeft className="h-4 w-4" strokeWidth={2.2} />
+                </button>
+                <button
+                  onClick={() => scrollRail(1)}
+                  aria-label="Next"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-plum/20 text-plum transition-colors hover:bg-coral hover:border-coral hover:text-cream"
+                >
+                  <ArrowRight className="h-4 w-4" strokeWidth={2.2} />
+                </button>
+              </div>
+            </div>
+
+            <div
+              ref={railRef}
+              className="-mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-px-5 px-5 pb-2 no-scrollbar sm:mx-0 sm:px-0"
+            >
+              {items.map((p, i) => (
+                <div
+                  key={p.id}
+                  className="w-[68vw] max-w-[290px] shrink-0 snap-start sm:w-[300px]"
+                >
+                  <ProductCard p={p} index={i} />
+                </div>
+              ))}
+            </div>
+            <div className="mt-10 text-center">
+              <Link to="/shop" className="pill-outline text-plum">
+                {t("အားလုံး ကြည့်ရန်", "View all products")} →
+              </Link>
+            </div>
           </div>
         ) : (
           <motion.div
@@ -262,7 +312,6 @@ export default function Products() {
       </div>
 
       {/* Modals */}
-      <QuickViewModal product={quickViewProduct} onClose={() => setQuickViewProduct(null)} />
       <OrderInstructions open={showInstructions} onClose={() => setShowInstructions(false)} />
       <SizeGuide open={showSizeGuide} onClose={() => setShowSizeGuide(false)} />
     </section>

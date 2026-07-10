@@ -12,7 +12,7 @@ const REVIEWS = [
     textEn: "The clothing is absolutely adorable. Great quality and very reasonable price. Will order again!",
     location: "Yangon",
     initials: "MN",
-    color: "#FF1F6E",
+    color: "#C08A78",
   },
   {
     id: 2,
@@ -34,7 +34,7 @@ const REVIEWS = [
     textEn: "Ordering via DM is so easy and customer service is excellent. Clothing quality is outstanding!",
     location: "Naypyidaw",
     initials: "SW",
-    color: "#7C3AED",
+    color: "#7C6A54",
   },
   {
     id: 4,
@@ -45,7 +45,7 @@ const REVIEWS = [
     textEn: "Wore this dress to an event and everyone complimented me. Love Sinar!",
     location: "Yangon",
     initials: "WT",
-    color: "#D97706",
+    color: "#A66B5C",
   },
 ]
 
@@ -88,11 +88,11 @@ export default function CustomerReviews() {
   const bgSection = isDark ? "bg-[#0F2415]" : "bg-[#F2EDE4]"
   const bgCard = isDark ? "bg-[#122B19]" : "bg-white"
   const border = isDark ? "border-[rgba(255,255,255,0.06)]" : "border-[rgba(45,90,61,0.10)]"
-  const textMain = isDark ? "text-[#F5F0E8]" : "text-[#1A2E1F]"
+  const textMain = isDark ? "text-[#F5F0E8]" : "text-[#16301F]"
   const textMuted = isDark ? "text-[#7A8F7D]" : "text-[#3D5A45]"
 
   return (
-    <section className={`py-24 lg:py-32 ${bgSection} grain-texture`}>
+    <section className={`py-24 lg:py-32 ${bgSection}`}>
       <div className="max-w-7xl mx-auto px-5 sm:px-8">
         {/* Header */}
         <div className="mb-14 text-center">

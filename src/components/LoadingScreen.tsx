@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import Botanical from "./Botanical"
 
 export default function LoadingScreen() {
   const [visible, setVisible] = useState(true)
@@ -35,6 +36,14 @@ export default function LoadingScreen() {
 
           {/* Center content */}
           <div className="text-center">
+            <motion.div
+              className="flex justify-center text-gold mb-4"
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 0.7, y: 0 }}
+              transition={{ duration: 1, delay: 0.3 }}
+            >
+              <Botanical className="h-16 w-auto" />
+            </motion.div>
             <div className="overflow-hidden mb-2">
               <motion.h1
                 className="font-serif text-7xl sm:text-9xl font-black tracking-[0.15em] text-cream"

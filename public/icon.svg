@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Soft cream/pink background matching the official logo backdrop -->
+  <rect width="512" height="512" rx="160" fill="#FAF5F2"/>
+  
+  <!-- Outer dotted circle in rosegold -->
+  <circle cx="256" cy="256" r="220" fill="none" stroke="#C28773" stroke-width="4" stroke-dasharray="12,12" opacity="0.35"/>
+
+  <!-- Butterfly / Leaf Side-View Logo centered and scaled -->
+  <g transform="translate(266, 230) scale(9.5)">
+    <!-- Upper Wing (Dark Green) -->
+    <path d="M 0,8 C -12,10 -26,2 -28,-22 C -28,-32 -24,-34 -20,-32 C -8,-28 -2,-14 0,-10" fill="#08160E" stroke="#C28773" stroke-width="1.5" stroke-linejoin="round" />
+    <!-- Middle Wing (Medium Green) -->
+    <path d="M 0,8 C -10,10 -24,10 -27,-8 C -27,-16 -24,-18 -20,-16 C -8,-10 -2,-9 0,-6" fill="#2E7D4F" stroke="#C28773" stroke-width="1.2" stroke-linejoin="round" />
+    <!-- Lower Wing (Sage Green) -->
+    <path d="M 0,8 C -6,10 -18,14 -18,4 C -18,-2 -15,-3 -12,-1 C -6,2 -2,4 0,6" fill="#7E8A81" stroke="#C28773" stroke-width="1" stroke-linejoin="round" />
+    <!-- Outer Body Line / Rosegold outline -->
+    <path d="M 0,8 C 2,-3 4,-10 6,-14" stroke="#C28773" stroke-width="1.8" stroke-linecap="round" fill="none" />
+    <!-- Head & Antennae -->
+    <circle cx="6" cy="-16" r="1.8" fill="#C28773" />
+    <path d="M 6,-17 C 8,-23 12,-23 12,-26" stroke="#C28773" stroke-width="1.2" fill="none" />
+    <path d="M 6,-17 C 5,-22 2,-24 0,-26" stroke="#C28773" stroke-width="1.2" fill="none" />
+    <!-- Star on Antenna -->
+    <g transform="translate(12,-27) scale(0.7)">
+      <path d="M0,-4 L1,-1 L4,-1 L1.5,1 L2.5,4 L0,2 L-2.5,4 L-1.5,1 L-4,-1 L-1,-1 Z" fill="#C28773" />
+    </g>
+    <!-- Bottom Curl (Rosegold) -->
+    <path d="M 0,8 C -5,14 -12,16 -14,12 C -16,8 -12,6 -9,9" stroke="#C28773" stroke-width="1.5" fill="none" stroke-linecap="round" />
+  </g>
+
+  <!-- Typography below the logo matching the official wordmark -->
+  <text x="256" y="420" font-family="Georgia, serif" font-size="46" font-weight="700" fill="#08160E" text-anchor="middle" letter-spacing="0.04em">SINAR</text>
+  <text x="256" y="458" font-family="'Inter', sans-serif" font-size="16" font-weight="500" letter-spacing="0.55em" fill="#C28773" text-anchor="middle">CLOTHING</text>
+</svg>

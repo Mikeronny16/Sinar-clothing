@@ -13,12 +13,13 @@ export default function Logo({ variant = "color", size = "md", className = "" }:
 
   const s = sizes[size]
 
-  const leaf1 = variant === "dark" ? "#A7D9B5" : "#2D6B3F"
-  const leaf2 = variant === "dark" ? "#7DC49A" : "#1E4D2C"
-  const vine  = variant === "dark" ? "#8BC4A0" : "#3D7A52"
-  const star  = variant === "dark" ? "#FFD96A" : "#F0A500"
-  const text1 = variant === "dark" ? "#F5F0E8" : "#1C2B1E"
-  const text2 = variant === "dark" ? "#A7D9B5" : "#3D7A52"
+  // Use the brand's official color palette
+  const leaf1 = "var(--color-text-sub)"      // Medium green (#276A45)
+  const leaf2 = "var(--color-text)"          // Deep Forest Green (#0F3B24)
+  const vine  = "var(--color-text-muted)"    // Sage Green (#81A689)
+  const star  = "#C28773"                     // Rosegold / Copper
+  const text1 = "var(--color-text)"          // Deep Forest Green (#0F3B24)
+  const text2 = "#C28773"                     // Rosegold / Copper
 
   const cx = s.iconCx
   const cy = s.h / 2

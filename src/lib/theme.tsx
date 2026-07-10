@@ -11,11 +11,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [isDark, setIsDark] = useState<boolean>(() => {
     try {
       const stored = localStorage.getItem("sinar-theme")
-      if (stored === "light") return false
-      // Default to dark
-      return true
+      if (stored === "dark") return true
+      // Default to light (Editorial Ivory — bone + black, quiet luxury)
+      return false
     } catch {
-      return true
+      return false
     }
   })
 

@@ -9,29 +9,35 @@ import { getLocalAnalytics, getLast7Days, getTodayVisits, getTotalVisits } from 
 import {
   Plus, Pencil, Trash2, X, Loader2, LogOut, Upload, Eye,
   LayoutDashboard, Package, BarChart2, TrendingUp, Users,
-  ShoppingBag, AlertCircle, CheckCircle, Tag, Search, ToggleLeft, ToggleRight
+  ShoppingBag, AlertCircle, CheckCircle, Tag, Search, ToggleLeft, ToggleRight, Film, Image
 } from "lucide-react"
 import { toast } from "sonner"
 import Logo from "@/components/Logo"
+import FilmsManager from "@/components/FilmsManager"
+import HeroManager from "@/components/HeroManager"
+import { COLOR_PALETTE, type ProductColor } from "@/lib/colors"
 
-type Tab = "dashboard" | "products" | "insights"
+type Tab = "dashboard" | "products" | "films" | "landing" | "insights"
 
 type FormData = {
   name_mm: string
   name_en: string
   category: string
   price: number
+  original_price?: number | null
+  badge?: string | null
   sizes: string
   status: string
   image_url: string
   sold_out: boolean
   sort_order: number
+  colors?: ProductColor[]
 }
 
 const CATEGORIES = ["Tops", "Cardigans", "Dresses", "Jeans", "Sweaters"]
 const STATUSES = ["In Stock", "Low Stock", "Out of Stock"]
 
-const inp = "w-full bg-[#0A1A0F] border border-[#1C3020] focus:border-[#FF1F6E] rounded-xl px-4 py-2.5 text-sm text-[#F5F0E8] placeholder-[#4A6350] focus:outline-none transition-colors"
+const inp = "w-full bg-[#0A1A0F] border border-[#1C3020] focus:border-[#C08A78] rounded-xl px-4 py-2.5 text-sm text-[#F5F0E8] placeholder-[#4A6350] focus:outline-none transition-colors"
 const lbl = "text-[10px] font-semibold text-[#7A8F7D] uppercase tracking-widest block mb-1.5"
 
 // ─── Product Form Modal ───────────────────────────────────────────────────────
@@ -44,6 +50,8 @@ function ProductForm({ initial, onClose, onSave }: {
     defaultValues: initial ? {
       name_mm: initial.name_mm, name_en: initial.name_en,
       category: initial.category, price: initial.price,
+      original_price: initial.original_price ?? undefined,
+      badge: initial.badge ?? "",
       sizes: initial.sizes.join(", "), status: initial.status,
       image_url: initial.image_url, sold_out: initial.sold_out,
       sort_order: initial.sort_order,
@@ -52,6 +60,10 @@ function ProductForm({ initial, onClose, onSave }: {
 
   const [uploading, setUploading] = useState(false)
   const [imagePreview, setImagePreview] = useState(initial?.image_url || "")
+  const [colors, setColors] = useState<ProductColor[]>(initial?.colors ?? [])
+
+  const toggleColor = (c: ProductColor) =>
+    setColors((prev) => (prev.some((x) => x.name === c.name) ? prev.filter((x) => x.name !== c.name) : [...prev, c]))
 
   async function uploadImage(file: File) {
     setUploading(true)
@@ -86,7 +98,14 @@ function ProductForm({ initial, onClose, onSave }: {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit(async (d) => onSave({ ...d, id: initial?.id, image_url: imagePreview || d.image_url }))} className="p-6 space-y-5">
+        <form onSubmit={handleSubmit(async (d) => onSave({
+          ...d,
+          id: initial?.id,
+          image_url: imagePreview || d.image_url,
+          colors,
+          original_price: d.original_price && !Number.isNaN(d.original_price) ? d.original_price : null,
+          badge: d.badge?.trim() ? d.badge.trim() : null,
+        }))} className="p-6 space-y-5">
           {/* Image */}
           <div>
             <label className={lbl}>ပုံ / Image</label>
@@ -98,7 +117,7 @@ function ProductForm({ initial, onClose, onSave }: {
             )}
             <div className="flex gap-2">
               <input {...register("image_url")} placeholder="Image URL (https://...)" className={inp + " flex-1 text-xs"} onChange={(e) => setImagePreview(e.target.value)} />
-              <label className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-semibold border border-[#1C3020] cursor-pointer hover:border-[#FF1F6E] text-[#7A8F7D] hover:text-[#FF1F6E] transition-colors whitespace-nowrap ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
+              <label className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-semibold border border-[#1C3020] cursor-pointer hover:border-[#C08A78] text-[#7A8F7D] hover:text-[#C08A78] transition-colors whitespace-nowrap ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
                 {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
                 Upload
                 <input type="file" accept="image/*" className="hidden" disabled={uploading} onChange={async (e) => {
@@ -112,12 +131,12 @@ function ProductForm({ initial, onClose, onSave }: {
             <div>
               <label className={lbl}>မြန်မာနာမည် *</label>
               <input {...register("name_mm", { required: "လိုအပ်သည်" })} className={inp + " font-mm"} placeholder="ဝတ်စုံနာမည်" />
-              {errors.name_mm && <p className="text-[#FF1F6E] text-xs mt-1">{errors.name_mm.message}</p>}
+              {errors.name_mm && <p className="text-[#C08A78] text-xs mt-1">{errors.name_mm.message}</p>}
             </div>
             <div>
               <label className={lbl}>English Name *</label>
               <input {...register("name_en", { required: "Required" })} className={inp} placeholder="Product name" />
-              {errors.name_en && <p className="text-[#FF1F6E] text-xs mt-1">{errors.name_en.message}</p>}
+              {errors.name_en && <p className="text-[#C08A78] text-xs mt-1">{errors.name_en.message}</p>}
             </div>
           </div>
 
@@ -153,16 +172,50 @@ function ProductForm({ initial, onClose, onSave }: {
             <input {...register("sizes")} placeholder="S, M, L, XL or 28, 29, 30" className={inp} />
           </div>
 
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={lbl}>ဈေးမူရင်း / Sale from (optional)</label>
+              <input type="number" {...register("original_price", { valueAsNumber: true })} className={inp} placeholder="45000" />
+            </div>
+            <div>
+              <label className={lbl}>Badge (optional)</label>
+              <input {...register("badge")} className={inp} placeholder="NEW · SALE · HOT" />
+            </div>
+          </div>
+
+          <div>
+            <label className={lbl}>အရောင်များ / Colours</label>
+            <div className="flex flex-wrap gap-2">
+              {COLOR_PALETTE.map((c) => {
+                const on = colors.some((x) => x.name === c.name)
+                return (
+                  <button
+                    type="button"
+                    key={c.name}
+                    onClick={() => toggleColor(c)}
+                    title={c.name}
+                    aria-label={c.name}
+                    className={`h-8 w-8 rounded-full border-2 transition-transform ${on ? "border-[#C08A78] scale-110" : "border-[#1C3020] hover:border-[#4A6350]"}`}
+                    style={{ background: c.hex }}
+                  />
+                )
+              })}
+            </div>
+            {colors.length > 0 && (
+              <p className="mt-2 text-[11px] text-[#7A8F7D]">{colors.map((c) => c.name).join(", ")}</p>
+            )}
+          </div>
+
           <div className="flex items-center gap-3 p-3 rounded-xl bg-[#0A1A0F] border border-[#1C3020]">
-            <input type="checkbox" {...register("sold_out")} id="sold_out" className="w-4 h-4 accent-[#FF1F6E]" />
+            <input type="checkbox" {...register("sold_out")} id="sold_out" className="w-4 h-4 accent-[#C08A78]" />
             <label htmlFor="sold_out" className="text-sm font-mm text-[#F5F0E8] cursor-pointer">Sold Out အမှတ်အသား</label>
           </div>
 
           <div className="flex gap-3 pt-1">
-            <button type="button" onClick={onClose} className="flex-1 border border-[#1C3020] text-[#7A8F7D] hover:text-[#F5F0E8] py-3 rounded-xl text-sm font-mm hover:border-[#FF1F6E]/40 transition-colors">
+            <button type="button" onClick={onClose} className="flex-1 border border-[#1C3020] text-[#7A8F7D] hover:text-[#F5F0E8] py-3 rounded-xl text-sm font-mm hover:border-[#C08A78]/40 transition-colors">
               ဖျက်သိမ်းမည်
             </button>
-            <button type="submit" disabled={isSubmitting || uploading} className="flex-1 bg-[#FF1F6E] text-white py-3 rounded-xl text-sm font-semibold hover:bg-[#e0185f] disabled:opacity-50 flex items-center justify-center gap-2 font-mm transition-colors">
+            <button type="submit" disabled={isSubmitting || uploading} className="flex-1 bg-[#C08A78] text-white py-3 rounded-xl text-sm font-semibold hover:bg-[#e0185f] disabled:opacity-50 flex items-center justify-center gap-2 font-mm transition-colors">
               {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
               သိမ်းဆည်းမည်
             </button>
@@ -206,7 +259,7 @@ function MiniBarChart({ data }: { data: { date: string; visits: number }[] }) {
             <span className="text-[9px] text-[#7A8F7D]">{d.visits > 0 ? d.visits : ""}</span>
             <div className="w-full rounded-t-md bg-[#0A1A0F] relative overflow-hidden" style={{ height: "64px" }}>
               <div
-                className="absolute bottom-0 inset-x-0 bg-[#FF1F6E] rounded-t-md transition-all duration-700"
+                className="absolute bottom-0 inset-x-0 bg-[#C08A78] rounded-t-md transition-all duration-700"
                 style={{ height: `${Math.max(pct, 2)}%` }}
               />
             </div>
@@ -296,6 +349,8 @@ export default function Admin() {
   const tabs = [
     { key: "dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { key: "products", icon: Package, label: "ပစ္စည်းများ" },
+    { key: "films", icon: Film, label: "ဗီဒီယို" },
+    { key: "landing", icon: Image, label: "Landing" },
     { key: "insights", icon: BarChart2, label: "Insights" },
   ] as const
 
@@ -315,7 +370,7 @@ export default function Admin() {
                 onClick={() => setTab(t.key)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   tab === t.key
-                    ? "bg-[#FF1F6E] text-white"
+                    ? "bg-[#C08A78] text-white"
                     : "text-[#7A8F7D] hover:text-[#F5F0E8] hover:bg-[#1C3020]"
                 }`}
               >
@@ -329,7 +384,7 @@ export default function Admin() {
             <a href="/" target="_blank" className="p-2 text-[#7A8F7D] hover:text-[#F5F0E8] transition-colors" title="Website ကြည့်ရန်">
               <Eye className="w-4 h-4" />
             </a>
-            <button onClick={handleLogout} className="p-2 text-[#7A8F7D] hover:text-[#FF1F6E] transition-colors" title="Logout">
+            <button onClick={handleLogout} className="p-2 text-[#7A8F7D] hover:text-[#C08A78] transition-colors" title="Logout">
               <LogOut className="w-4 h-4" />
             </button>
           </div>
@@ -363,7 +418,7 @@ export default function Admin() {
                     <h3 className="text-[#F5F0E8] font-semibold">Page Visits</h3>
                     <p className="text-[11px] text-[#7A8F7D] mt-0.5">ဒီနေ့: {todayVisits} · စုစုပေါင်း: {totalVisits}</p>
                   </div>
-                  <TrendingUp className="w-5 h-5 text-[#FF1F6E]" />
+                  <TrendingUp className="w-5 h-5 text-[#C08A78]" />
                 </div>
                 <MiniBarChart data={weekData} />
               </div>
@@ -374,7 +429,7 @@ export default function Admin() {
                 <div className="space-y-3">
                   <button
                     onClick={() => { setTab("products"); setEditing("new") }}
-                    className="w-full flex items-center gap-3 p-3 rounded-xl bg-[#FF1F6E]/10 border border-[#FF1F6E]/20 text-[#FF1F6E] hover:bg-[#FF1F6E]/20 transition-colors text-sm font-mm"
+                    className="w-full flex items-center gap-3 p-3 rounded-xl bg-[#C08A78]/10 border border-[#C08A78]/20 text-[#C08A78] hover:bg-[#C08A78]/20 transition-colors text-sm font-mm"
                   >
                     <Plus className="w-4 h-4" />
                     ပစ္စည်းအသစ် ထည့်ရန်
@@ -409,7 +464,7 @@ export default function Admin() {
                     <div key={cat} className="flex items-center gap-4">
                       <span className="text-xs text-[#7A8F7D] w-20 flex-shrink-0">{cat}</span>
                       <div className="flex-1 h-2 bg-[#0A1A0F] rounded-full overflow-hidden">
-                        <div className="h-full bg-[#FF1F6E] rounded-full transition-all duration-700" style={{ width: `${pct}%` }} />
+                        <div className="h-full bg-[#C08A78] rounded-full transition-all duration-700" style={{ width: `${pct}%` }} />
                       </div>
                       <span className="text-xs text-[#F5F0E8] font-bold w-8 text-right">{count}</span>
                     </div>
@@ -430,7 +485,7 @@ export default function Admin() {
               </div>
               <button
                 onClick={() => setEditing("new")}
-                className="flex items-center gap-2 bg-[#FF1F6E] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#e0185f] transition-colors self-start sm:self-auto"
+                className="flex items-center gap-2 bg-[#C08A78] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#e0185f] transition-colors self-start sm:self-auto"
               >
                 <Plus className="w-4 h-4" />
                 <span className="font-mm">ပစ္စည်းအသစ်</span>
@@ -445,7 +500,7 @@ export default function Admin() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="ပစ္စည်းရှာရန်..."
-                  className="w-full pl-10 pr-4 py-2.5 bg-[#0F2415] border border-[#1C3020] rounded-xl text-sm text-[#F5F0E8] placeholder-[#4A6350] focus:outline-none focus:border-[#FF1F6E] transition-colors font-mm"
+                  className="w-full pl-10 pr-4 py-2.5 bg-[#0F2415] border border-[#1C3020] rounded-xl text-sm text-[#F5F0E8] placeholder-[#4A6350] focus:outline-none focus:border-[#C08A78] transition-colors font-mm"
                 />
               </div>
               <div className="flex gap-2 overflow-x-auto no-scrollbar">
@@ -455,7 +510,7 @@ export default function Admin() {
                     onClick={() => setFilterCat(c)}
                     className={`whitespace-nowrap px-4 py-2 rounded-full text-xs font-semibold transition-all ${
                       filterCat === c
-                        ? "bg-[#FF1F6E] text-white"
+                        ? "bg-[#C08A78] text-white"
                         : "bg-[#0F2415] border border-[#1C3020] text-[#7A8F7D] hover:text-[#F5F0E8]"
                     }`}
                   >
@@ -467,7 +522,7 @@ export default function Admin() {
 
             {isLoading ? (
               <div className="flex items-center justify-center py-20">
-                <Loader2 className="w-8 h-8 animate-spin text-[#FF1F6E]" />
+                <Loader2 className="w-8 h-8 animate-spin text-[#C08A78]" />
               </div>
             ) : (
               <div className="bg-[#0F2415] rounded-2xl border border-[#1C3020] overflow-hidden">
@@ -489,7 +544,7 @@ export default function Admin() {
                           <td className="px-5 py-3">
                             <img src={p.image_url || FALLBACK_IMG} alt={p.name_en}
                               onError={(e) => { (e.currentTarget as HTMLImageElement).src = FALLBACK_IMG }}
-                              className="w-12 h-12 rounded-xl object-cover border border-[#1C3020] group-hover:border-[#FF1F6E]/20 transition-colors" />
+                              className="w-12 h-12 rounded-xl object-cover border border-[#1C3020] group-hover:border-[#C08A78]/20 transition-colors" />
                           </td>
                           <td className="px-5 py-3 min-w-[140px]">
                             <p className="font-mm font-semibold text-sm text-[#F5F0E8] leading-snug">{p.name_mm}</p>
@@ -499,7 +554,7 @@ export default function Admin() {
                             <span className="text-xs bg-[#0A1A0F] border border-[#1C3020] text-[#7A8F7D] px-2.5 py-1 rounded-full">{p.category}</span>
                           </td>
                           <td className="px-5 py-3">
-                            <span className="font-mm font-bold text-sm text-[#FF1F6E]">
+                            <span className="font-mm font-bold text-sm text-[#C08A78]">
                               {p.price > 0 ? `${p.price.toLocaleString()} ကျပ်` : "—"}
                             </span>
                           </td>
@@ -522,7 +577,7 @@ export default function Admin() {
                           <td className="px-5 py-3">
                             <button
                               onClick={() => toggleSoldOut.mutate({ id: p.id, sold_out: !p.sold_out })}
-                              className={`flex items-center gap-1.5 text-xs transition-colors ${p.sold_out ? "text-[#FF1F6E]" : "text-[#4A6350] hover:text-[#F5F0E8]"}`}
+                              className={`flex items-center gap-1.5 text-xs transition-colors ${p.sold_out ? "text-[#C08A78]" : "text-[#4A6350] hover:text-[#F5F0E8]"}`}
                             >
                               {p.sold_out
                                 ? <ToggleRight className="w-5 h-5" />
@@ -556,14 +611,14 @@ export default function Admin() {
                       <div className="flex-1 min-w-0">
                         <p className="font-mm font-semibold text-sm text-[#F5F0E8] truncate">{p.name_mm}</p>
                         <p className="text-xs text-[#7A8F7D]">{p.category}</p>
-                        {p.price > 0 && <p className="font-mm text-xs font-bold text-[#FF1F6E] mt-0.5">{p.price.toLocaleString()} ကျပ်</p>}
-                        {p.sold_out && <span className="text-[9px] bg-[#FF1F6E]/15 text-[#FF1F6E] px-2 py-0.5 rounded-full font-bold mt-1 inline-block">SOLD OUT</span>}
+                        {p.price > 0 && <p className="font-mm text-xs font-bold text-[#C08A78] mt-0.5">{p.price.toLocaleString()} ကျပ်</p>}
+                        {p.sold_out && <span className="text-[9px] bg-[#C08A78]/15 text-[#C08A78] px-2 py-0.5 rounded-full font-bold mt-1 inline-block">SOLD OUT</span>}
                       </div>
                       <div className="flex flex-col gap-2 flex-shrink-0">
                         <button onClick={() => setEditing(p)} className="p-1.5 text-[#7A8F7D] hover:text-[#F5F0E8]"><Pencil className="w-4 h-4" /></button>
                         <button onClick={() => setDeleting(p.id)} className="p-1.5 text-[#7A8F7D] hover:text-red-400"><Trash2 className="w-4 h-4" /></button>
                         <button onClick={() => toggleSoldOut.mutate({ id: p.id, sold_out: !p.sold_out })}
-                          className={p.sold_out ? "text-[#FF1F6E]" : "text-[#4A6350]"}>
+                          className={p.sold_out ? "text-[#C08A78]" : "text-[#4A6350]"}>
                           {p.sold_out ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
                         </button>
                       </div>
@@ -575,13 +630,19 @@ export default function Admin() {
                   <div className="text-center py-16">
                     <ShoppingBag className="w-10 h-10 text-[#1C3020] mx-auto mb-3" />
                     <p className="text-[#7A8F7D] font-mm text-sm">ပစ္စည်းမတွေ့ပါ</p>
-                    <button onClick={() => { setSearch(""); setFilterCat("All") }} className="mt-2 text-[#FF1F6E] text-xs font-mm">Filter ဖယ်ရှားရန်</button>
+                    <button onClick={() => { setSearch(""); setFilterCat("All") }} className="mt-2 text-[#C08A78] text-xs font-mm">Filter ဖယ်ရှားရန်</button>
                   </div>
                 )}
               </div>
             )}
           </div>
         )}
+
+        {/* ══ FILMS TAB ══════════════════════════════════════════════════════ */}
+        {tab === "films" && <FilmsManager />}
+
+        {/* ══ LANDING TAB ════════════════════════════════════════════════════ */}
+        {tab === "landing" && <HeroManager />}
 
         {/* ══ INSIGHTS TAB ═══════════════════════════════════════════════════ */}
         {tab === "insights" && (
@@ -593,7 +654,7 @@ export default function Admin() {
 
             {/* Visit overview */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <StatCard icon={Users} label="Today Visits" value={todayVisits} sub="ဒီနေ့ ဝင်သည်" color="bg-[#FF1F6E]/20 text-[#FF1F6E]" />
+              <StatCard icon={Users} label="Today Visits" value={todayVisits} sub="ဒီနေ့ ဝင်သည်" color="bg-[#C08A78]/20 text-[#C08A78]" />
               <StatCard icon={TrendingUp} label="Total Visits" value={totalVisits} sub="စုစုပေါင်း" color="bg-blue-500/20 text-blue-400" />
               <StatCard icon={BarChart2} label="This Week" value={weekData.reduce((s, d) => s + d.visits, 0)} sub="ဒီတပတ်" color="bg-purple-500/20 text-purple-400" />
               <StatCard icon={Eye} label="Pages Tracked" value={allAnalytics.length} sub={`${allAnalytics.length} ရက်`} color="bg-emerald-500/20 text-emerald-400" />
@@ -621,7 +682,7 @@ export default function Admin() {
                       <div className="flex items-center gap-3">
                         <div className="w-24 h-1.5 bg-[#0A1A0F] rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-[#FF1F6E] rounded-full"
+                            className="h-full bg-[#C08A78] rounded-full"
                             style={{ width: `${Math.min((d.visits / Math.max(...allAnalytics.map(x => x.visits))) * 100, 100)}%` }}
                           />
                         </div>

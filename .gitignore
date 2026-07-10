@@ -11,6 +11,11 @@ node_modules
 dist
 dist-ssr
 .output
+
+# Env (never commit real keys) — .env.example is kept as the template
+.env
+.env.*
+!.env.example
 .vinxi
 .tanstack/**
 .nitro
@@ -30,3 +35,4 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+.vercel

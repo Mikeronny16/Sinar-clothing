@@ -1,62 +1,58 @@
 import { motion } from "framer-motion"
-import { Eye, MessageCircle, Heart } from "lucide-react"
-import { useState, useEffect } from "react"
+import { Heart, ArrowUpRight } from "lucide-react"
+import { Link } from "react-router-dom"
 import { FALLBACK_IMG } from "@/lib/products"
-import { messengerUrl } from "@/config"
 import { useLang } from "@/lib/lang"
-import { useTheme } from "@/lib/theme"
+import { useWishlist } from "@/lib/wishlist"
+import { useCart } from "@/lib/cart"
 import type { Product } from "@/lib/supabase"
+
+const SERIF = '"Playfair Display", "Lora", Georgia, serif'
 
 interface Props {
   p: Product | (typeof import("@/lib/products").FALLBACK_PRODUCTS)[number]
-  index: number
-  onQuickView: (p: Product) => void
-  /** large = takes double column on first row */
-  large?: boolean
+  index?: number
 }
 
-function useWishlist(productId: string) {
-  const [liked, setLiked] = useState(false)
-  const key = `sinar_wishlist_${productId}`
+export default function ProductCard({ p, index = 0 }: Props) {
+  const { t, lang } = useLang()
+  const { has, toggle } = useWishlist()
+  const { add } = useCart()
+  const id = String(p.id ?? p.name_en)
+  const liked = has(id)
+  const prod = p as Product
+  const colors = Array.isArray(prod.colors) ? prod.colors : []
 
-  useEffect(() => {
-    setLiked(localStorage.getItem(key) === "1")
-  }, [key])
-
-  function toggle(e: React.MouseEvent) {
+  const quickAdd = (e: React.MouseEvent) => {
+    e.preventDefault()
     e.stopPropagation()
-    const next = !liked
-    setLiked(next)
-    if (next) localStorage.setItem(key, "1")
-    else localStorage.removeItem(key)
+    if (p.sold_out) return
+    add({
+      id,
+      name_en: p.name_en,
+      name_mm: p.name_mm,
+      price: p.price,
+      image_url: p.image_url,
+      size: p.sizes?.[0],
+    })
   }
 
-  return { liked, toggle }
-}
-
-export default function ProductCard({ p, index, onQuickView, large = false }: Props) {
-  const dmUrl = messengerUrl(p.name_en)
-  const { t, lang } = useLang()
-  const { isDark } = useTheme()
-  const { liked, toggle: toggleWishlist } = useWishlist(String(p.id ?? p.name_en))
-
-  const bgCard = isDark ? "bg-[#122B19]" : "bg-white"
-  const border = isDark ? "border-[rgba(255,255,255,0.06)]" : "border-[rgba(45,90,61,0.10)]"
-  const hoverBorder = "hover:border-pink/30"
-  const textMain = isDark ? "text-[#F5F0E8]" : "text-[#1A2E1F]"
-  const textSub = isDark ? "text-[#7A8F7D]" : "text-[#3D5A45]"
+  const idx = String(index + 1).padStart(2, "0")
 
   return (
     <motion.article
-      className={`group relative ${bgCard} rounded-2xl overflow-hidden border ${border} ${hoverBorder} transition-all duration-500 flex flex-col shadow-card hover:shadow-editorial`}
-      initial={{ opacity: 0, y: 40 }}
+      className="group flex flex-col transition-transform duration-500 ease-out hover:-translate-y-1.5"
+      initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.7, delay: (index % 5) * 0.07, ease: [0.16, 1, 0.3, 1] }}
-      whileHover={{ y: -6 }}
+      transition={{ duration: 0.6, delay: (index % 5) * 0.06, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* Image container — 75% height */}
-      <div className={`relative overflow-hidden bg-[#0F2415] ${large ? "aspect-[3/4] sm:aspect-[2/3]" : "aspect-[3/4]"}`}>
+      {/* Image */}
+      <Link
+        to={`/product/${id}`}
+        className="relative block overflow-hidden rounded-[3px] bg-bg-mid"
+        style={{ aspectRatio: "3 / 4" }}
+      >
         <img
           src={p.image_url || FALLBACK_IMG}
           alt={p.name_en}
@@ -65,131 +61,92 @@ export default function ProductCard({ p, index, onQuickView, large = false }: Pr
             const el = e.currentTarget
             if (!el.dataset.fb) { el.dataset.fb = "1"; el.src = FALLBACK_IMG }
           }}
-          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-[1100ms] ease-out group-hover:scale-[1.08]"
         />
 
-        {/* Soft vignette overlay on hover */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        {/* cinematic scrim + View cue on hover */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#1A1611]/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+        {!p.sold_out && (
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 flex translate-y-4 items-center gap-2 p-4 text-[#F3EEE4] opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+            <span className="text-[10px] font-medium uppercase tracking-[0.3em]">{t("ကြည့်ရန်", "View")}</span>
+            <span className="h-px flex-1" style={{ background: "#C28773" }} />
+            <ArrowUpRight className="h-4 w-4" strokeWidth={1.6} />
+          </div>
+        )}
 
-        {/* Sold out overlay */}
         {p.sold_out && (
-          <div className="absolute inset-0 bg-black/55 flex items-center justify-center">
-            <span className="bg-pink text-white text-[10px] font-bold px-5 py-2 rounded-full uppercase tracking-[0.3em]">
-              {t("ရောင်းပြီး", "SOLD OUT")}
+          <div className="absolute inset-0 flex items-center justify-center bg-[#1A1611]/45">
+            <span className="border border-[#F3EEE4] px-4 py-1.5 text-[10px] font-medium uppercase tracking-[0.3em] text-[#F3EEE4]">
+              {t("ရောင်းပြီး", "Sold Out")}
             </span>
           </div>
         )}
 
-        {/* Status badge — top left */}
-        <div className="absolute top-3 left-3">
-          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-bold backdrop-blur-md uppercase tracking-wider ${
-            p.sold_out
-              ? "bg-pink/20 border border-pink/40 text-pink"
-              : p.status === "In Stock"
-              ? "bg-emerald-dim border border-emerald/20 text-emerald"
-              : "bg-yellow-500/20 border border-yellow-500/30 text-yellow-400"
-          }`}>
-            <span className="w-1 h-1 rounded-full bg-current" />
-            {p.sold_out ? t("ရောင်းပြီး", "Sold Out") : p.status}
+        {prod.badge && (
+          <span className="absolute left-3 top-3 bg-[#1A1611] px-2 py-1 text-[9px] uppercase tracking-[0.2em] text-[#F3EEE4]">
+            {prod.badge}
           </span>
+        )}
+
+        {/* Wishlist heart — minimal */}
+        <button
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggle(id) }}
+          aria-label={liked ? "Remove from wishlist" : "Save to wishlist"}
+          className={`absolute right-3 top-3 transition-colors ${liked ? "text-coral" : "text-[#F3EEE4] drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)] hover:text-coral"}`}
+        >
+          <Heart className="h-[17px] w-[17px]" fill={liked ? "currentColor" : "none"} strokeWidth={1.6} />
+        </button>
+      </Link>
+
+      {/* Info below image */}
+      <div className="mt-4 flex flex-1 flex-col">
+        <div className="flex items-baseline justify-between gap-2">
+          <span className="text-[9px] uppercase tracking-[0.28em] text-text-muted">{idx}</span>
+          {p.category && (
+            <span className="text-[9px] uppercase tracking-[0.28em] text-text-muted">{p.category}</span>
+          )}
         </div>
 
-        {/* Top-right: Wishlist + Size chips */}
-        <div className="absolute top-3 right-3 flex flex-col items-end gap-1.5">
-          {/* Wishlist button */}
-          <button
-            onClick={toggleWishlist}
-            className="w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-200"
-            style={{
-              background: liked ? "rgba(255,31,110,0.85)" : "rgba(0,0,0,0.45)",
-              border: liked ? "1px solid #FF1F6E" : "1px solid rgba(255,255,255,0.2)",
-            }}
-            aria-label={liked ? "Remove from wishlist" : "Add to wishlist"}
-          >
-            <Heart
-              className="w-4 h-4 transition-transform duration-200"
-              style={{ color: liked ? "white" : "rgba(255,255,255,0.8)", fill: liked ? "white" : "none", transform: liked ? "scale(1.15)" : "scale(1)" }}
-            />
-          </button>
-          {/* Size chips */}
-          <div className="flex flex-wrap gap-1 justify-end max-w-[80px]">
-            {p.sizes.slice(0, 3).map((s) => (
+        <h3
+          className={`mt-2 text-[17px] leading-snug text-text ${lang === "mm" ? "font-mm" : ""}`}
+          style={lang === "mm" ? undefined : { fontFamily: SERIF, fontWeight: 500 }}
+        >
+          {lang === "mm" ? p.name_mm : p.name_en}
+        </h3>
+
+        <div className="mt-1 flex items-baseline gap-2">
+          <span className="text-sm text-coral">
+            {p.price > 0 ? `${p.price.toLocaleString()} ${t("ကျပ်", "Ks")}` : t("ဈေးမေးရန်", "Ask for price")}
+          </span>
+          {prod.original_price && prod.original_price > p.price && (
+            <span className="text-xs text-text-muted line-through">
+              {prod.original_price.toLocaleString()} {t("ကျပ်", "Ks")}
+            </span>
+          )}
+        </div>
+
+        {colors.length > 0 && (
+          <div className="mt-2 flex items-center gap-1.5">
+            {colors.slice(0, 6).map((c, ci) => (
               <span
-                key={s}
-                className="bg-black/50 backdrop-blur text-white/90 text-[9px] font-bold w-6 h-6 rounded-full flex items-center justify-center border border-white/20"
-              >
-                {s}
-              </span>
+                key={ci}
+                title={c.name}
+                className="h-3.5 w-3.5 rounded-full border border-text/20"
+                style={{ background: c.hex }}
+              />
             ))}
+            {colors.length > 6 && <span className="text-[10px] text-text-muted">+{colors.length - 6}</span>}
           </div>
-        </div>
+        )}
 
-        {/* Hover action buttons — slide up */}
-        <div className="absolute inset-x-0 bottom-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-400 ease-out flex flex-col gap-2">
-          {!p.sold_out && (
-            <a
-              href={dmUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full bg-pink text-white py-2.5 rounded-xl text-xs font-semibold hover:shadow-pink transition-shadow"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <MessageCircle className="w-3.5 h-3.5" />
-              <span className={lang === "mm" ? "font-mm" : ""}>{t("မှာရန်", "Order")}</span>
-            </a>
-          )}
-          <button
-            onClick={() => onQuickView(p as Product)}
-            className="flex items-center justify-center gap-2 w-full bg-black/50 backdrop-blur border border-white/20 text-white py-2.5 rounded-xl text-xs font-medium hover:border-pink transition-colors"
-          >
-            <Eye className="w-3.5 h-3.5" />
-            <span className={lang === "mm" ? "font-mm" : ""}>{t("အသေးစိတ်", "Quick View")}</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Card info — minimal, magazine-style */}
-      <div className="p-4 flex flex-col gap-2">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <h3 className={`font-mm font-semibold text-sm sm:text-base leading-snug truncate ${textMain}`}>
-              {p.name_mm}
-            </h3>
-            <p className={`text-[11px] mt-0.5 truncate ${textSub}`}>{p.name_en}</p>
-          </div>
-
-          {/* Quick view icon */}
-          <button
-            onClick={() => onQuickView(p as Product)}
-            className={`flex-shrink-0 p-1.5 rounded-full border transition-all duration-200 hover:border-pink/40 hover:text-pink ${
-              isDark
-                ? "border-[rgba(255,255,255,0.08)] text-[#7A8F7D]"
-                : "border-[rgba(45,90,61,0.12)] text-[#3D5A45]"
-            }`}
-            aria-label="Quick view"
-          >
-            <Eye className="w-3 h-3" />
-          </button>
-        </div>
-
-        <div className="flex items-center justify-between">
-          {p.price > 0 ? (
-            <p className="font-mm font-bold text-pink text-sm sm:text-base">
-              {p.price.toLocaleString()} ကျပ်
-            </p>
-          ) : (
-            <p className={`font-mm text-xs ${textSub}`}>{t("ဈေးနှုန်းမေးရန်", "Ask for price")}</p>
-          )}
-
-          {/* Category pill */}
-          <span className={`editorial-label text-[9px] px-2 py-1 rounded-full border ${
-            isDark
-              ? "border-[rgba(255,255,255,0.08)] text-[#7A8F7D]"
-              : "border-[rgba(45,90,61,0.12)] text-[#3D5A45]"
-          }`}>
-            {p.category}
-          </span>
-        </div>
+        {/* Editorial add button */}
+        <button
+          onClick={quickAdd}
+          disabled={p.sold_out}
+          className="mt-4 w-full border border-text/20 py-2.5 text-[10px] font-medium uppercase tracking-[0.28em] text-text transition-all duration-300 hover:bg-text hover:text-bg disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {p.sold_out ? t("ရောင်းပြီး", "Sold Out") : t("ခြင်းထဲ ထည့်ရန်", "Add to Bag")}
+        </button>
       </div>
     </motion.article>
   )

@@ -2,25 +2,37 @@ import Navbar from "@/components/Navbar"
 import Hero from "@/components/Hero"
 import MarqueeStrip from "@/components/MarqueeStrip"
 import Products from "@/components/Products"
+import StatementBand from "@/components/StatementBand"
+import Features from "@/components/Features"
 import CustomerReviews from "@/components/CustomerReviews"
 import About from "@/components/About"
 import Footer from "@/components/Footer"
+import BottomNav from "@/components/BottomNav"
+import AnimatedBackground from "@/components/AnimatedBackground"
+import OutfitMixer from "@/components/OutfitMixer"
+import { ScrollProgress } from "@/lib/motion"
 import { useTheme } from "@/lib/theme"
 
 export default function Home() {
   const { isDark } = useTheme()
 
   return (
-    <div className={`min-h-screen ${isDark ? "bg-[#0A1A0F]" : "bg-[#FAF7F2]"} transition-colors duration-300`}>
+    <div id="top" className="min-h-screen text-text transition-colors duration-300 relative overflow-hidden">
+      <AnimatedBackground />
+      <ScrollProgress />
+      <MarqueeStrip />
       <Navbar />
       <Hero />
-      <div id="marquee">
-        <MarqueeStrip />
-      </div>
+      <OutfitMixer />
       <Products />
+      <StatementBand />
+      <Features />
       <CustomerReviews />
       <About />
       <Footer />
+      {/* space so the floating bottom nav never covers footer content */}
+      <div className="h-24" />
+      <BottomNav />
     </div>
   )
 }
