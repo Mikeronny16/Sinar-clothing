@@ -1,22 +1,22 @@
+import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { X, Minus, Plus, Trash2, ShoppingBag } from "lucide-react"
-import { toast } from "sonner"
 import { useCart } from "@/lib/cart"
 import { useLang } from "@/lib/lang"
 import { FALLBACK_IMG } from "@/lib/products"
+import { viberLink } from "@/config"
 
 export default function CartDrawer() {
-  const { items, open, setOpen, setQty, remove, total, count, orderUrl, orderText, clear } = useCart()
+  const { items, open, setOpen, setQty, remove, total, count, orderText, clear } = useCart()
   const { t } = useLang()
+  const [copied, setCopied] = useState(false)
 
-  const orderViaViber = async () => {
-    try {
-      await navigator.clipboard.writeText(orderText())
-      toast.success(t("Order ကူးပြီး — Viber မှာ paste လုပ်ပါ", "Order copied — paste it in Viber"))
-    } catch {
-      /* clipboard may be blocked; still open Viber */
-    }
-    window.open(orderUrl(), "_blank", "noopener,noreferrer")
+  // m.me / viber links can't pre-fill a message — copy the order to the
+  // clipboard so the customer just pastes it into the chat.
+  const copyOrder = () => {
+    navigator.clipboard?.writeText(orderText()).catch(() => {})
+    setCopied(true)
+    setTimeout(() => setCopied(false), 4000)
   }
 
   return (
@@ -100,11 +100,13 @@ export default function CartDrawer() {
                   <span className="text-sm uppercase tracking-wide text-text-muted">{t("စုစုပေါင်း", "Total")}</span>
                   <span className="display text-2xl">{total.toLocaleString()} {t("ကျပ်", "Ks")}</span>
                 </div>
-                <button onClick={orderViaViber} className="pill w-full">
+                <a href={viberLink()} onClick={copyOrder} className="pill w-full">
                   {t("Viber ဖြင့် မှာမယ်", "Order via Viber")}
-                </button>
+                </a>
                 <p className="mt-2 text-center text-[11px] text-text-muted">
-                  {t("Order စာသား ကူးထားပြီး Viber ဖွင့်ပေးပါမယ် — paste လုပ်လိုက်ပါ", "We copy your order & open Viber — just paste and send")}
+                  {copied
+                    ? t("Order စာသား copy လုပ်ပြီးပါပြီ — chat ထဲမှာ paste လုပ်ပြီး ပို့ပေးပါ ✓", "Order copied — paste it into the chat and send ✓")
+                    : t("နှိပ်လိုက်ရင် order စာသားကို copy လုပ်ပေးပါမယ် — chat ထဲမှာ paste လုပ်ပါ", "Tapping copies your order — paste it into the chat")}
                 </p>
               </div>
             )}

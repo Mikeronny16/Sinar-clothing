@@ -11,6 +11,7 @@ import Portfolio from "./pages/Portfolio"
 import Auth from "./pages/Auth"
 import Admin from "./pages/Admin"
 import CursorFollower from "./components/CursorFollower"
+import IntroLoader from "./components/IntroLoader"
 import CartDrawer from "./components/CartDrawer"
 import InstallButton from "./components/InstallButton"
 import { LangProvider } from "./lib/lang"
@@ -41,6 +42,7 @@ export default function App() {
                   style: { background: "#1A1611", border: "1px solid #C28773", color: "#F3EEE4" },
                 }}
               />
+              <IntroLoader />
               <CursorFollower />
               <CartDrawer />
               <InstallButton />

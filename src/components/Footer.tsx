@@ -1,7 +1,7 @@
 import { motion } from "framer-motion"
-import { Facebook, MessageCircle, Phone } from "lucide-react"
+import { Facebook, Phone } from "lucide-react"
 import { Link } from "react-router-dom"
-import { SITE } from "@/config"
+import { SITE, viberLink } from "@/config"
 
 const SERIF = '"Playfair Display", "Lora", Georgia, serif'
 
@@ -100,15 +100,13 @@ export default function Footer() {
               </a>
 
               <a
-                href={`https://m.me/${SITE.facebookPageId}`}
-                target="_blank"
-                rel="noopener noreferrer"
+                href={viberLink()}
                 className="flex items-center gap-3 text-[#EFE9DD]/70 hover:text-[#C28773] transition-colors"
               >
                 <div className="w-8 h-8 rounded-full border border-[#EFE9DD]/15 flex items-center justify-center">
-                  <MessageCircle className="w-3.5 h-3.5" />
+                  <Phone className="w-3.5 h-3.5" />
                 </div>
-                <span className="font-mm text-sm">Messenger DM</span>
+                <span className="text-sm">Viber {SITE.viber}</span>
               </a>
 
               {SITE.phone && SITE.phone !== "+959XXXXXXXXX" && (

@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Menu, X, Sun, Moon, ShoppingCart } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import { SITE } from "@/config"
-import Logo from "@/components/Logo"
 import { useLang } from "@/lib/lang"
 import { useTheme } from "@/lib/theme"
 import { useCart } from "@/lib/cart"
@@ -48,12 +47,12 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between gap-4">
         {/* Logo */}
-        <a href="/" className="flex-shrink-0 hover:opacity-80 transition-opacity duration-300">
-          {onDark ? (
-            <Logo variant="dark" size="sm" />
-          ) : (
-            <img src="/logo-mark.png" alt="Sinar Clothing" className="h-11 w-auto" />
-          )}
+        <a
+          href="/"
+          className={`flex-shrink-0 text-2xl tracking-wide transition-opacity duration-300 hover:opacity-80 ${onDark ? "text-[#F5F0E8]" : "text-text"}`}
+          style={{ fontFamily: '"Playfair Display", "Lora", Georgia, serif', fontWeight: 600 }}
+        >
+          Sinar
         </a>
 
         {/* Desktop nav */}
@@ -207,9 +206,14 @@ export default function Navbar() {
                 </motion.a>
               </div>
 
-              {/* Logo at bottom of drawer */}
+              {/* Wordmark at bottom of drawer */}
               <div className="px-6 pb-8">
-                <Logo variant={isDark ? "dark" : "light"} size="sm" />
+                <span
+                  className="text-2xl tracking-wide text-text"
+                  style={{ fontFamily: '"Playfair Display", "Lora", Georgia, serif', fontWeight: 600 }}
+                >
+                  Sinar
+                </span>
               </div>
             </motion.div>
           </>

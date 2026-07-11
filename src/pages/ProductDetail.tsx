@@ -7,7 +7,7 @@ import { useProducts } from "@/lib/useProducts"
 import { useLang } from "@/lib/lang"
 import { useCart } from "@/lib/cart"
 import { useWishlist } from "@/lib/wishlist"
-import { viberUrl } from "@/config"
+import { viberLink } from "@/config"
 import { FALLBACK_IMG } from "@/lib/products"
 
 export default function ProductDetail() {
@@ -157,7 +157,7 @@ export default function ProductDetail() {
             <button onClick={() => { addToBag(); setOpen(true) }} className="pill-outline mt-3 justify-center text-plum">
               {t("ချက်ချင်း Order တင်မယ်", "Buy now — order via bag")}
             </button>
-            <a href={viberUrl(p.name_en)} target="_blank" rel="noopener noreferrer" className="mt-3 text-center text-xs text-text-muted underline hover:text-coral">
+            <a href={viberLink()} className="mt-3 text-center text-xs text-text-muted underline hover:text-coral">
               {t("ဒီ ဝတ်စုံအကြောင်း Viber မေးမယ်", "Ask about this piece on Viber")}
             </a>
           </div>

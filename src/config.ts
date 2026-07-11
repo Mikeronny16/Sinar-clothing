@@ -15,11 +15,12 @@ export function messengerUrl(productName: string) {
 
 // Viber deep-links via `viber://chat?number=` only work when the number is
 // already saved in the visitor's contacts (otherwise Viber says "request
-// unavailable"). msng.link is a web→app redirector that opens a chat with any
-// number reliably across devices.
+// unavailable"), and third-party redirectors like msng.link are unreliable.
+// `viber://add?number=` opens Viber's Add Contact screen with the shop number
+// pre-filled — works for everyone, one tap from there to chat.
 export function viberLink() {
   const num = SITE.viber.replace(/\D/g, "")
-  return `https://msng.link/o/?${num}=vi`
+  return `viber://add?number=${num}`
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -9,7 +9,6 @@ import About from "@/components/About"
 import Footer from "@/components/Footer"
 import BottomNav from "@/components/BottomNav"
 import AnimatedBackground from "@/components/AnimatedBackground"
-import OutfitMixer from "@/components/OutfitMixer"
 import { ScrollProgress } from "@/lib/motion"
 import { useTheme } from "@/lib/theme"
 
@@ -23,7 +22,6 @@ export default function Home() {
       <MarqueeStrip />
       <Navbar />
       <Hero />
-      <OutfitMixer />
       <Products />
       <StatementBand />
       <Features />

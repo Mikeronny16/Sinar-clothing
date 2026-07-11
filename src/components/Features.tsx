@@ -12,8 +12,8 @@ const CARDS = [
   {
     en: "Order via DM",
     mm: "DM ဖြင့် မှာယူ",
-    bodyEn: "See something you love? Message us on Messenger or Viber and we'll sort your order in minutes.",
-    bodyMm: "ကြိုက်နှစ်သက်သည့် ဝတ်စုံတွေ့ရှိပါက Messenger သို့မဟုတ် Viber မှတစ်ဆင့် စာပို့၍ လွယ်ကူစွာ မှာယူနိုင်ပါသည်။",
+    bodyEn: "See something you love? Message us on Viber and we'll sort your order in minutes.",
+    bodyMm: "ကြိုက်နှစ်သက်သည့် ဝတ်စုံတွေ့ရှိပါက Viber မှတစ်ဆင့် စာပို့၍ လွယ်ကူစွာ မှာယူနိုင်ပါသည်။",
   },
   {
     en: "Yangon Delivery",

@@ -122,8 +122,6 @@ export default function QuickViewModal({ product: p, onClose }: Props) {
                     <div className="grid grid-cols-2 gap-2">
                       <a
                         href={vUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
                         className="flex items-center justify-center gap-2 w-full bg-forest border border-hairline hover:border-emerald text-cream hover:text-emerald py-3 rounded-xl text-sm transition-colors"
                       >
                         <Phone className="w-3.5 h-3.5" />

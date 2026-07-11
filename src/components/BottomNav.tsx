@@ -1,6 +1,6 @@
 import { Home, ShoppingBag, Heart, MessageCircle, ShoppingCart } from "lucide-react"
 import { useLocation, useNavigate } from "react-router-dom"
-import { SITE } from "@/config"
+import { viberLink } from "@/config"
 import { useLang } from "@/lib/lang"
 import { useWishlist } from "@/lib/wishlist"
 import { useCart } from "@/lib/cart"
@@ -17,7 +17,7 @@ export default function BottomNav() {
     { id: "shop", icon: ShoppingBag, mm: "ဆိုင်", en: "Shop", to: "/shop" },
     { id: "saved", icon: Heart, mm: "သိမ်း", en: "Saved", to: "/saved", badge: savedCount },
     { id: "bag", icon: ShoppingCart, mm: "စျေးခြင်း", en: "Bag", badge: cartCount, action: () => setOpen(true) },
-    { id: "chat", icon: MessageCircle, mm: "Viber", en: "Viber", href: `https://msng.link/o/?${SITE.viber.replace(/\D/g, "")}=vi` },
+    { id: "chat", icon: MessageCircle, mm: "Viber", en: "Viber", href: viberLink() },
   ]
 
   const isActive = (to?: string) => to && (to === "/" ? pathname === "/" : pathname.startsWith(to))
@@ -52,7 +52,7 @@ export default function BottomNav() {
           }`
 
           if (item.href) {
-            return <a key={item.id} href={item.href} target="_blank" rel="noopener noreferrer" className={cls}>{inner}</a>
+            return <a key={item.id} href={item.href} className={cls}>{inner}</a>
           }
           return (
             <button
