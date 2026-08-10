@@ -13,7 +13,10 @@ import Admin from "./pages/Admin"
 import CursorFollower from "./components/CursorFollower"
 import IntroLoader from "./components/IntroLoader"
 import CartDrawer from "./components/CartDrawer"
+import WishlistDrawer from "./components/WishlistDrawer"
+import SocialProofPopup from "./components/SocialProofPopup"
 import InstallButton from "./components/InstallButton"
+import AiStylistBot from "./components/AiStylistBot"
 import { LangProvider } from "./lib/lang"
 import { ThemeProvider } from "./lib/theme"
 import { WishlistProvider } from "./lib/wishlist"
@@ -36,17 +39,20 @@ export default function App() {
         <QueryClientProvider client={queryClient}>
           <WishlistProvider>
             <CartProvider>
-              <Toaster
-                position="bottom-center"
-                toastOptions={{
-                  style: { background: "#1A1611", border: "1px solid #C28773", color: "#F3EEE4" },
-                }}
-              />
-              <IntroLoader />
-              <CursorFollower />
-              <CartDrawer />
-              <InstallButton />
               <BrowserRouter>
+                <Toaster
+                  position="bottom-center"
+                  toastOptions={{
+                    style: { background: "#1A1611", border: "1px solid #C28773", color: "#F3EEE4" },
+                  }}
+                />
+                <IntroLoader />
+                <CursorFollower />
+                <CartDrawer />
+                <WishlistDrawer />
+                <InstallButton />
+                <SocialProofPopup />
+                <AiStylistBot />
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/shop" element={<Shop />} />

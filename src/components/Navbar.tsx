@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, Sun, Moon, ShoppingCart } from "lucide-react"
+import { Menu, X, Sun, Moon, ShoppingCart, Heart } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import { SITE } from "@/config"
 import { useLang } from "@/lib/lang"
 import { useTheme } from "@/lib/theme"
 import { useCart } from "@/lib/cart"
+import { useWishlist } from "@/lib/wishlist"
+import { openWishlistDrawer } from "@/components/WishlistDrawer"
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -13,6 +15,7 @@ export default function Navbar() {
   const { lang, toggle: toggleLang, t } = useLang()
   const { isDark, toggle: toggleTheme } = useTheme()
   const { count: cartCount, setOpen: setCartOpen } = useCart()
+  const { count: wishlistCount } = useWishlist()
   const { pathname } = useLocation()
 
   useEffect(() => {
@@ -69,6 +72,21 @@ export default function Navbar() {
               <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-coral group-hover:w-full transition-all duration-300" />
             </Link>
           ))}
+
+          {/* Wishlist */}
+          <button
+            onClick={() => openWishlistDrawer()}
+            aria-label="Open saved wishlist"
+            className={`relative rounded-full p-2 transition-colors ${onDark ? "text-cream/80 hover:text-coral" : "text-plum/80 hover:text-coral"}`}
+            title="Saved Wishlist"
+          >
+            <Heart className="h-[18px] w-[18px]" strokeWidth={2} />
+            {wishlistCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-pink px-1 text-[9px] font-bold text-cream">
+                {wishlistCount}
+              </span>
+            )}
+          </button>
 
           {/* Cart */}
           <button

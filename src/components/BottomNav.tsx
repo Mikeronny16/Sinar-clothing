@@ -4,6 +4,7 @@ import { viberLink } from "@/config"
 import { useLang } from "@/lib/lang"
 import { useWishlist } from "@/lib/wishlist"
 import { useCart } from "@/lib/cart"
+import { openWishlistDrawer } from "@/components/WishlistDrawer"
 
 export default function BottomNav() {
   const { t, lang } = useLang()
@@ -15,7 +16,7 @@ export default function BottomNav() {
   const items = [
     { id: "home", icon: Home, mm: "ပင်မ", en: "Home", to: "/" },
     { id: "shop", icon: ShoppingBag, mm: "ဆိုင်", en: "Shop", to: "/shop" },
-    { id: "saved", icon: Heart, mm: "သိမ်း", en: "Saved", to: "/saved", badge: savedCount },
+    { id: "saved", icon: Heart, mm: "သိမ်း", en: "Saved", badge: savedCount, action: () => openWishlistDrawer() },
     { id: "bag", icon: ShoppingCart, mm: "စျေးခြင်း", en: "Bag", badge: cartCount, action: () => setOpen(true) },
     { id: "chat", icon: MessageCircle, mm: "Viber", en: "Viber", href: viberLink() },
   ]

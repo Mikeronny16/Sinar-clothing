@@ -9,15 +9,16 @@ import { getLocalAnalytics, getLast7Days, getTodayVisits, getTotalVisits } from 
 import {
   Plus, Pencil, Trash2, X, Loader2, LogOut, Upload, Eye,
   LayoutDashboard, Package, BarChart2, TrendingUp, Users,
-  ShoppingBag, AlertCircle, CheckCircle, Tag, Search, ToggleLeft, ToggleRight, Film, Image
+  ShoppingBag, AlertCircle, CheckCircle, Tag, Search, ToggleLeft, ToggleRight, Film, Image, MessageCircle
 } from "lucide-react"
 import { toast } from "sonner"
 import Logo from "@/components/Logo"
 import FilmsManager from "@/components/FilmsManager"
 import HeroManager from "@/components/HeroManager"
+import AdminLiveChat from "@/components/AdminLiveChat"
 import { COLOR_PALETTE, type ProductColor } from "@/lib/colors"
 
-type Tab = "dashboard" | "products" | "films" | "landing" | "insights"
+type Tab = "dashboard" | "products" | "films" | "landing" | "insights" | "livechat"
 
 type FormData = {
   name_mm: string
@@ -349,6 +350,7 @@ export default function Admin() {
   const tabs = [
     { key: "dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { key: "products", icon: Package, label: "ပစ္စည်းများ" },
+    { key: "livechat", icon: MessageCircle, label: "Live Chat" },
     { key: "films", icon: Film, label: "ဗီဒီယို" },
     { key: "landing", icon: Image, label: "Landing" },
     { key: "insights", icon: BarChart2, label: "Insights" },
@@ -704,6 +706,9 @@ export default function Admin() {
             </div>
           </div>
         )}
+
+        {/* ══ LIVE CHAT TAB ══════════════════════════════════════════════════ */}
+        {tab === "livechat" && <AdminLiveChat />}
       </main>
 
       {/* ── Modals ── */}
