@@ -315,3 +315,91 @@
 /* Star rating */
 .star-filled { color: #2E7D4F; }
 .star-empty { color: #7A8F7D; }
+
+/* ══════════════════════════════════════════════════════════════
+   THE SINAR ISSUE  (/story)
+   Her two colours: green + pink. Scoped to the page so the rest
+   of the site keeps its editorial-ivory palette.
+   ══════════════════════════════════════════════════════════════ */
+.film {
+  --st-ink: #0A2418;
+  --st-green: #14503A;
+  --st-green-mid: #1E6A4C;
+  --st-green-soft: #8FB19E;
+  --st-pink: #E4839B;
+  --st-pink-deep: #C25E78;
+  --st-pink-soft: #F7DDE3;
+  --st-paper: #FCF5F3;
+  background: var(--st-paper);
+  color: var(--st-ink);
+}
+.film ::selection { background: var(--st-pink); color: #fff; }
+
+.film-micro {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.story-folio {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+.story-ghost {
+  font-family: "Playfair Display", Georgia, serif;
+  font-weight: 700;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(20, 80, 58, 0.22);
+  line-height: 0.8;
+  white-space: nowrap;
+  user-select: none;
+}
+.story-rule {
+  height: 1px;
+  background: linear-gradient(90deg, var(--st-pink) 0%, rgba(20, 80, 58, 0.28) 45%, transparent 100%);
+}
+.story-drop::first-letter {
+  float: left;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 3.6em;
+  line-height: 0.78;
+  padding: 0.08em 0.12em 0 0;
+  color: var(--st-green);
+}
+.story-plate-empty {
+  background:
+    radial-gradient(120% 90% at 20% 15%, rgba(228, 131, 155, 0.35), transparent 60%),
+    linear-gradient(150deg, var(--st-green) 0%, var(--st-ink) 100%);
+}
+
+/* the film's hairline rule — inherits the scene's own colour */
+.film-rule {
+  height: 1px;
+  width: 100%;
+  background: currentColor;
+  opacity: 0.3;
+}
+
+/* Scene readouts must clear the floating bottom nav, or the folio and the
+   scroll cue end up underneath it. */
+.film { --foot: 104px; }
+.film-foot { padding-bottom: calc(1rem + var(--foot, 0px)); }
+
+/* The film speaks in a hand. Kaushan Script was Sinar's original wordmark face
+   and is already loaded, so this costs nothing extra. Scoped to .film — the
+   shop pages keep Playfair.
+   Burmese has no handwriting face to fall back on, so MM headlines stay on the
+   Myanmar stack; only the Latin display changes. */
+.film .display {
+  font-family: "Kaushan Script", "Playfair Display", Georgia, cursive;
+  font-weight: 400;
+  line-height: 1.16;
+  letter-spacing: 0.004em;
+}
+
+/* The closing credits are the one readout that shares the floor with the
+   stylist button, which comes back exactly there — so they sit higher. */
+.film-foot-lg { padding-bottom: calc(1rem + var(--foot, 0px) + 58px); }

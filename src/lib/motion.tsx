@@ -1,5 +1,5 @@
 import { useRef, type ReactNode } from "react"
-import { motion, useScroll, useTransform } from "framer-motion"
+import { motion, useInView, useScroll, useTransform } from "framer-motion"
 
 const EASE = [0.16, 1, 0.3, 1] as const
 
@@ -38,13 +38,17 @@ export function LineReveal({
   delay?: number
   className?: string
 }) {
+  // Observe the OUTER span: the inner one starts translated fully outside this
+  // overflow-hidden box, so observing it would clip it out of the viewport and
+  // the reveal would never fire.
+  const ref = useRef<HTMLSpanElement>(null)
+  const inView = useInView(ref, { once: true, margin: "-60px" })
   return (
-    <span className="block overflow-hidden">
+    <span ref={ref} className="block overflow-hidden">
       <motion.span
         className={`block ${className}`}
         initial={{ y: "110%" }}
-        whileInView={{ y: "0%" }}
-        viewport={{ once: true, margin: "-60px" }}
+        animate={inView ? { y: "0%" } : { y: "110%" }}
         transition={{ duration: 0.9, delay, ease: EASE }}
       >
         {children}

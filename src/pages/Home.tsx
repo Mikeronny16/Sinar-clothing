@@ -1,36 +1,33 @@
-import Navbar from "@/components/Navbar"
-import Hero from "@/components/Hero"
-import MarqueeStrip from "@/components/MarqueeStrip"
-import Products from "@/components/Products"
-import StatementBand from "@/components/StatementBand"
-import Features from "@/components/Features"
-import CustomerReviews from "@/components/CustomerReviews"
-import About from "@/components/About"
+import { useEffect } from "react"
 import Footer from "@/components/Footer"
-import BottomNav from "@/components/BottomNav"
-import AnimatedBackground from "@/components/AnimatedBackground"
-import { ScrollProgress } from "@/lib/motion"
-import { useTheme } from "@/lib/theme"
+import HeldNav from "@/components/film/HeldNav"
+import Chrome from "@/components/film/Chrome"
+import Act from "@/components/film/Act"
+import Closer from "@/components/film/Closer"
+import { ACTS } from "@/components/film/acts"
+import { holdOverlays } from "@/lib/overlays"
 
+/**
+ * The front door is a film, not a page. Seven sticky acts scroll past a fixed
+ * chrome that inverts with each scene, then the season and the way in.
+ * The old shop-front homepage is kept at /classic.
+ */
 export default function Home() {
-  const { isDark } = useTheme()
+  useEffect(() => () => holdOverlays(false), [])
 
   return (
-    <div id="top" className="min-h-screen text-text transition-colors duration-300 relative overflow-hidden">
-      <AnimatedBackground />
-      <ScrollProgress />
-      <MarqueeStrip />
-      <Navbar />
-      <Hero />
-      <Products />
-      <StatementBand />
-      <Features />
-      <CustomerReviews />
-      <About />
+    <div id="top" className="film relative">
+      <Chrome />
+
+      {ACTS.map((act) => (
+        <Act key={act.n} act={act} total={ACTS.length} />
+      ))}
+
+      <Closer />
+
       <Footer />
-      {/* space so the floating bottom nav never covers footer content */}
       <div className="h-24" />
-      <BottomNav />
+      <HeldNav />
     </div>
   )
 }

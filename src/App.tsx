@@ -6,6 +6,7 @@ import Shop from "./pages/Shop"
 import ProductDetail from "./pages/ProductDetail"
 import AboutPage from "./pages/AboutPage"
 import Film from "./pages/Film"
+import HomeClassic from "./pages/HomeClassic"
 import Saved from "./pages/Saved"
 import Portfolio from "./pages/Portfolio"
 import Auth from "./pages/Auth"
@@ -14,9 +15,7 @@ import CursorFollower from "./components/CursorFollower"
 import IntroLoader from "./components/IntroLoader"
 import CartDrawer from "./components/CartDrawer"
 import WishlistDrawer from "./components/WishlistDrawer"
-import SocialProofPopup from "./components/SocialProofPopup"
-import InstallButton from "./components/InstallButton"
-import AiStylistBot from "./components/AiStylistBot"
+import FloatingChrome from "./components/FloatingChrome"
 import { LangProvider } from "./lib/lang"
 import { ThemeProvider } from "./lib/theme"
 import { WishlistProvider } from "./lib/wishlist"
@@ -50,15 +49,14 @@ export default function App() {
                 <CursorFollower />
                 <CartDrawer />
                 <WishlistDrawer />
-                <InstallButton />
-                <SocialProofPopup />
-                <AiStylistBot />
+                <FloatingChrome />
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/shop" element={<Shop />} />
                   <Route path="/product/:id" element={<ProductDetail />} />
                   <Route path="/about" element={<AboutPage />} />
                   <Route path="/film" element={<Film />} />
+                  <Route path="/classic" element={<HomeClassic />} />
                   <Route path="/saved" element={<Saved />} />
                   <Route path="/portfolio" element={<Portfolio />} />
                   <Route path="/auth" element={<Auth />} />
