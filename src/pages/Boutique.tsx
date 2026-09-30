@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Link } from "react-router-dom"
-import { ArrowLeft, ChevronLeft, ChevronRight, ShoppingBag, X } from "lucide-react"
+import { ArrowLeft, ChevronLeft, ChevronRight, Share2, ShoppingBag, X } from "lucide-react"
 import { toast } from "sonner"
 import { Boutique as Engine } from "@/boutique/engine"
 import { useProducts } from "@/lib/useProducts"
@@ -8,6 +8,10 @@ import { useLang } from "@/lib/lang"
 import { useCart } from "@/lib/cart"
 import { holdOverlays } from "@/lib/overlays"
 import { FALLBACK_IMG } from "@/lib/products"
+import SizeGuide from "@/components/SizeGuide"
+
+// walls read in this order; anything else follows
+const WALL_ORDER = ["Dresses", "Tops", "Cardigans", "Sweaters", "Jeans"]
 
 const ks = (n: number) => `${n.toLocaleString("en-US")} Ks`
 
@@ -18,7 +22,14 @@ const ks = (n: number) => `${n.toLocaleString("en-US")} Ks`
  */
 export default function BoutiquePage() {
   const { t, lang } = useLang()
-  const products = useProducts()
+  const live = useProducts()
+  // hang by category so each run of wall has one sign; keep the shop's own order inside a category
+  const products = useMemo(() => {
+    const rank = (c: string) => { const i = WALL_ORDER.indexOf(c); return i < 0 ? WALL_ORDER.length : i }
+    return live.map((p, i) => ({ p, i })).sort((a, b) => rank(a.p.category) - rank(b.p.category) || a.p.category.localeCompare(b.p.category) || a.i - b.i).map((x) => x.p)
+  }, [live])
+  const [sizeGuide, setSizeGuide] = useState(false)
+  const wantPiece = useRef(new URLSearchParams(window.location.search).get("piece"))
   const { add, count, setOpen } = useCart()
   const canvas = useRef<HTMLCanvasElement>(null)
   const engine = useRef<Engine | null>(null)
@@ -30,6 +41,7 @@ export default function BoutiquePage() {
 
   const items = useMemo(() => products.map((p) => ({
     id: p.id, img: p.image_url || FALLBACK_IMG, soldOut: !!p.sold_out, category: p.category,
+    price: p.price, onSale: !!p.original_price && p.original_price > p.price, badge: p.badge,
   })), [products])
 
   // the floating stylist / toasts / install pill would sit on top of the room
@@ -50,6 +62,8 @@ export default function BoutiquePage() {
       engine.current = new Engine(canvas.current, {
         onSelect: (i) => { setSel(i); setSize(undefined); setHint(false) },
         onProgress: (l, n) => setProgress([l, n]),
+        onCounter: () => setOpen(true),
+        onFitting: () => setSizeGuide(true),
       })
       if (import.meta.env.DEV) (window as unknown as { __boutique: Engine }).__boutique = engine.current // test hook
       setReady(true)
@@ -57,7 +71,19 @@ export default function BoutiquePage() {
     return () => { alive = false; engine.current?.dispose(); engine.current = null }
   }, [])
 
-  useEffect(() => { if (ready) engine.current?.setItems(items) }, [ready, items])
+  useEffect(() => {
+    if (!ready || !engine.current) return
+    engine.current.setItems(items)
+    // a shared link (?piece=<id>) walks straight up to that piece once it is on the wall
+    if (wantPiece.current && engine.current.selectId(wantPiece.current)) wantPiece.current = null
+  }, [ready, items])
+
+  // keep the address bar pointing at the piece in front of you, so it can be copied as is
+  useEffect(() => {
+    const id = sel !== null ? products[sel]?.id : null
+    const url = id ? `/boutique?piece=${encodeURIComponent(id)}` : "/boutique"
+    if (window.location.pathname + window.location.search !== url) window.history.replaceState(window.history.state, "", url)
+  }, [sel, products])
 
   useEffect(() => {
     const id = window.setTimeout(() => setHint(false), 9000)
@@ -67,6 +93,21 @@ export default function BoutiquePage() {
   const p = sel !== null ? products[sel] : null
   const loaded = ready && progress[0] >= Math.min(progress[1], 8)
   const name = (x: { name_mm: string; name_en: string }) => (lang === "mm" ? x.name_mm || x.name_en : x.name_en || x.name_mm)
+
+  const share = async () => {
+    if (!p) return
+    const url = `${window.location.origin}/boutique?piece=${encodeURIComponent(p.id)}`
+    const title = `Sinar · ${name(p)}`
+    try {
+      if (navigator.share) { await navigator.share({ title, text: `${name(p)} · ${ks(p.price)}`, url }); return }
+    } catch { return /* the visitor closed the share sheet */ }
+    try {
+      await navigator.clipboard.writeText(url)
+      toast(t("Link ကူးပြီးပါပြီ — Viber / Facebook မှာ paste လုပ်ပါ", "Link copied — paste it into Viber or Facebook"))
+    } catch {
+      window.prompt(t("ဒီ link ကို ကူးပါ", "Copy this link"), url)
+    }
+  }
 
   const addToBag = () => {
     if (!p) return
@@ -99,6 +140,7 @@ export default function BoutiquePage() {
         <div className={`pointer-events-none absolute inset-x-4 bottom-8 mx-auto max-w-md rounded-2xl bg-[#1A1611]/75 px-5 py-3 text-center text-sm backdrop-blur ${lang === "mm" ? "font-mm" : ""}`}>
           {t("ဆွဲပြီး လှည့်ကြည့်ပါ · ကြမ်းပြင်ကို နှိပ်ရင် လျှောက်သွားမယ် · အဝတ်ပုံကို နှိပ်ရင် ကြည့်မယ်",
             "Drag to look around · tap the floor to walk · tap a piece to see it")}
+          <span className="mt-1 block text-xs opacity-75">{t("Counter = ငွေရှင်း · ကန့်လန့်ကာ = Size guide", "Counter = pay · curtain = size guide")}</span>
           <span className="mt-1 hidden text-xs opacity-70 md:block">{t("Computer: W A S D နဲ့ လမ်းလျှောက်", "On a computer: W A S D to walk")}</span>
         </div>
       )}
@@ -123,7 +165,10 @@ export default function BoutiquePage() {
                   {p.original_price && p.original_price > p.price && <span className="ml-2 text-sm font-normal text-[#8a7f72] line-through">{ks(p.original_price)}</span>}
                 </p>
               </div>
-              <button onClick={() => engine.current?.select(null)} className="rounded-full p-1.5 hover:bg-black/5" aria-label={t("ပိတ်မယ်", "Close")}><X size={20} /></button>
+              <div className="flex shrink-0 items-center gap-1">
+                <button onClick={share} className="rounded-full p-1.5 hover:bg-black/5" aria-label={t("မျှဝေမယ်", "Share")}><Share2 size={19} /></button>
+                <button onClick={() => engine.current?.select(null)} className="rounded-full p-1.5 hover:bg-black/5" aria-label={t("ပိတ်မယ်", "Close")}><X size={20} /></button>
+              </div>
             </div>
             {p.sold_out ? (
               <p className={`mt-3 rounded-xl bg-[#1A1611] px-3 py-2 text-center text-sm text-[#F3EEE4] ${lang === "mm" ? "font-mm" : ""}`}>{t("ကုန်သွားပါပြီ", "Sold out")}</p>
@@ -145,6 +190,8 @@ export default function BoutiquePage() {
           </div>
         </div>
       )}
+
+      <SizeGuide open={sizeGuide} onClose={() => setSizeGuide(false)} />
 
       {/* doors opening */}
       {!loaded && (

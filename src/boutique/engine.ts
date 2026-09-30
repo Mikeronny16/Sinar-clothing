@@ -16,11 +16,23 @@ export interface BoutiqueItem {
   img: string
   soldOut: boolean
   category: string
+  price: number
+  onSale: boolean
+  badge?: string | null
 }
 
 export interface BoutiqueEvents {
   onSelect: (index: number | null) => void
   onProgress: (loaded: number, total: number) => void
+  /** the counter was tapped: open the bag (pay at the till) */
+  onCounter: () => void
+  /** the fitting-room curtain was tapped: show the size guide */
+  onFitting: () => void
+}
+
+/** Wall signs: English over Burmese. Unknown categories fall back to their own name. */
+const CATEGORY_MM: Record<string, string> = {
+  Dresses: "ဂါဝန်", Tops: "အပေါ်ဝတ်", Cardigans: "ကာဒီဂင်", Sweaters: "ဆွယ်တာ", Jeans: "ဂျင်း",
 }
 
 // room: x -W/2..W/2, z -D/2 (back wall) .. +D/2 (shop front), floor y 0
@@ -53,7 +65,11 @@ export class Boutique {
   private disposed = false
   private hoverEl: HTMLElement
   private items: BoutiqueItem[] = []
+  private place: number[] = []           // item index -> slot index
   private soldTex: THREE.Texture
+  private counter!: THREE.Mesh
+  private curtain!: THREE.Mesh
+  private signs = new THREE.Group()
 
   constructor(private canvas: HTMLCanvasElement, private ev: BoutiqueEvents) {
     this.hoverEl = canvas
@@ -75,7 +91,7 @@ export class Boutique {
 
     this.soldTex = labelTexture("SOLD OUT", "#1A1611", "#F3EEE4")
     this.floor = this.buildRoom()
-    this.scene.add(this.products)
+    this.scene.add(this.products, this.signs)
     this.slots = this.buildSlots()
 
     this.resize()
@@ -91,14 +107,30 @@ export class Boutique {
 
   /** (Re)hang the collection. Called again when the live catalogue replaces the fallback. */
   setItems(items: BoutiqueItem[]) {
+    // each category starts on a fresh column (its sign needs the space above it)
+    this.place = []
+    let slot = 0, prevCat = ""
+    for (const it of items) {
+      if (it.category !== prevCat && slot % 2 === 1) slot++
+      prevCat = it.category
+      if (slot >= this.slots.length) break
+      this.place.push(slot++)
+    }
+    items = items.slice(0, this.place.length)
     this.items = items
+    const used = new Set(this.place)
     for (const m of this.pickables) {
       const mat = m.material as THREE.MeshStandardMaterial
       mat.map?.dispose()
       mat.dispose()
     }
     this.products.clear()
+    this.signs.traverse((o) => { const m = o as THREE.Mesh; if (m.isMesh) { (m.material as THREE.MeshBasicMaterial).map?.dispose(); m.geometry.dispose() } })
+    this.signs.clear()
     this.pickables = []
+    const tags = tagAtlas(items)
+    const tagMat = new THREE.MeshBasicMaterial({ map: tags.tex, transparent: true })
+    const stringMat = new THREE.MeshBasicMaterial({ color: 0x8a6d44 })
     const frameGeo = new RoundedBoxGeometry(0.7, 0.9, 0.04, 2, 0.012)
     const frameMat = new THREE.MeshStandardMaterial({ color: BRASS, metalness: 0.7, roughness: 0.35 })
     const matGeo = new THREE.PlaneGeometry(0.64, 0.84)
@@ -112,10 +144,10 @@ export class Boutique {
     const glowMat = new THREE.MeshBasicMaterial({ map: radialTexture(), color: 0x6a4a2a, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })
     const glowGeo = new THREE.PlaneGeometry(1.3, 1.5)
     let loaded = 0
-    const total = Math.min(items.length, this.slots.length)
+    const total = items.length
     this.ev.onProgress(0, total)
-    items.slice(0, this.slots.length).forEach((it, i) => {
-      const s = this.slots[i]
+    items.forEach((it, i) => {
+      const s = this.slots[this.place[i]]
       const g = new THREE.Group()
       g.position.copy(s.pos)
       g.lookAt(s.pos.clone().add(s.normal))
@@ -134,11 +166,21 @@ export class Boutique {
       glow.position.set(0, 0.12, -0.03)
       g.add(glow)
       // one picture light per column: on the top frame of the column
-      const perRow = this.slots.length / 2
-      if (i >= perRow || i + perRow >= total) {
+      if (this.place[i] % 2 === 1 || !used.has(this.place[i] + 1)) {
         const lamp = new THREE.Mesh(lampGeo, lampMat)
         lamp.position.set(0, 0.55, 0.12)
         g.add(lamp)
+      }
+      // hang tag on the frame's lower-right corner: price, and SALE / badge when there is one
+      if (!it.soldOut) {
+        const tag = new THREE.Mesh(tagPlane(0.3, 0.12, tags.uv(i)), tagMat)
+        tag.position.set(0.24, -0.44, 0.05)
+        tag.rotation.z = 0.08
+        g.add(tag)
+        const str = new THREE.Mesh(new THREE.BoxGeometry(0.004, 0.08, 0.002), stringMat)
+        str.position.set(0.22, -0.36, 0.045)
+        str.rotation.z = 0.5
+        g.add(str)
       }
       if (it.soldOut) {
         const sold = new THREE.Mesh(soldGeo, soldMat)
@@ -171,14 +213,44 @@ export class Boutique {
         },
       )
     })
+    this.hangSigns(items)
     this.dirty = true
+  }
+
+  /** A brass plaque above the first column of every category run: "Dresses / ဂါဝန်". */
+  private hangSigns(items: BoutiqueItem[]) {
+    const plate = new THREE.MeshStandardMaterial({ color: BRASS, metalness: 0.75, roughness: 0.35 })
+    let prev = ""
+    items.forEach((it, i) => {
+      if (it.category === prev) return
+      prev = it.category
+      const s = this.slots[this.place[i]]
+      const g = new THREE.Group()
+      g.position.copy(s.pos).setY(3.02)
+      g.lookAt(g.position.clone().add(s.normal))
+      g.add(new THREE.Mesh(new RoundedBoxGeometry(0.62, 0.24, 0.02, 2, 0.01), plate))
+      const face = new THREE.Mesh(new THREE.PlaneGeometry(0.58, 0.2), new THREE.MeshBasicMaterial({
+        map: signTexture(it.category, CATEGORY_MM[it.category] ?? ""), transparent: true,
+      }))
+      face.position.z = 0.012
+      g.add(face)
+      this.signs.add(g)
+    })
+  }
+
+  /** Stand in front of a piece by id (share links). Returns false when it isn't hung. */
+  selectId(id: string) {
+    const i = this.items.findIndex((it) => it.id === id)
+    if (i < 0) return false
+    this.select(i)
+    return true
   }
 
   select(i: number | null) {
     this.selected = i
     this.ev.onSelect(i)
     if (i === null) return
-    const s = this.slots[i]
+    const s = this.slots[this.place[i]]
     if (!s) return
     // stand back from the frame and aim a little below it, so the piece sits above the card
     const phone = this.camera.aspect < 0.8
@@ -191,7 +263,7 @@ export class Boutique {
   }
 
   step(dir: 1 | -1) {
-    const n = Math.min(this.items.length, this.slots.length)
+    const n = this.items.length
     if (!n) return
     const cur = this.selected ?? (dir > 0 ? -1 : 0)
     this.select((cur + dir + n) % n)
@@ -286,11 +358,11 @@ export class Boutique {
     add(new THREE.ShapeGeometry(arch, 32), new THREE.MeshStandardMaterial({ color: 0x3b5c44, roughness: 0.8 }), 0, 0, -D / 2 + 0.01)
 
     // counter in front of the sign: green front, bone marble-ish top, flowers, "Order on Viber" plaque
-    add(new RoundedBoxGeometry(2.4, 0.95, 0.6, 2, 0.04), new THREE.MeshStandardMaterial({ color: GREEN_DEEP, roughness: 0.6 }), 0, 0.475, -D / 2 + 1.1)
+    this.counter = add(new RoundedBoxGeometry(2.4, 0.95, 0.6, 2, 0.04), new THREE.MeshStandardMaterial({ color: GREEN_DEEP, roughness: 0.6 }), 0, 0.475, -D / 2 + 1.1)
     add(new RoundedBoxGeometry(2.5, 0.05, 0.7, 2, 0.02), new THREE.MeshStandardMaterial({ color: BONE, roughness: 0.25 }), 0, 0.975, -D / 2 + 1.1)
     add(new THREE.BoxGeometry(2.3, 0.02, 0.02), brass, 0, 0.12, -D / 2 + 1.41)
-    const plaque = textTexture("Order on Viber", '600 "Inter", sans-serif', "#1A1611", null, 512, 96, 44)
-    add(new THREE.PlaneGeometry(1.0, 0.19), new THREE.MeshBasicMaterial({ map: plaque, transparent: true }), 0, 0.6, -D / 2 + 1.405)
+    const plaque = textTexture("Pay here · Order on Viber", '600 "Inter", sans-serif', "#F3EEE4", null, 768, 96, 40)
+    add(new THREE.PlaneGeometry(1.5, 0.19), new THREE.MeshBasicMaterial({ map: plaque, transparent: true }), 0, 0.6, -D / 2 + 1.405)
     this.flowers(0.8, 1.0, -D / 2 + 1.1, 0.5)
     this.obstacles.push({ x: 0, z: -D / 2 + 1.1, r: 1.35 })
 
@@ -307,7 +379,7 @@ export class Boutique {
     const cp = curtain.getAttribute("position") as THREE.BufferAttribute
     for (let i = 0; i < cp.count; i++) cp.setZ(i, Math.sin(cp.getX(i) * 18) * 0.04)
     curtain.computeVertexNormals()
-    add(curtain, new THREE.MeshStandardMaterial({ color: 0x2c5a3c, roughness: 0.95, side: THREE.DoubleSide }), -W / 2 + 1.2, 1.2, D / 2 - 1.9, Math.PI / 2)
+    this.curtain = add(curtain, new THREE.MeshStandardMaterial({ color: 0x2c5a3c, roughness: 0.95, side: THREE.DoubleSide }), -W / 2 + 1.2, 1.2, D / 2 - 1.9, Math.PI / 2)
     add(new THREE.CylinderGeometry(0.015, 0.015, 1.6, 8), brass, -W / 2 + 1.2, 2.38, D / 2 - 1.9).rotation.x = Math.PI / 2
     const fit = textTexture("ဝတ်ကြည့်ခန်း · Fitting", '500 "Noto Sans Myanmar", "Inter", sans-serif', "#1A1611", null, 512, 80, 30)
     add(new THREE.PlaneGeometry(0.9, 0.14), new THREE.MeshBasicMaterial({ map: fit, transparent: true }), -W / 2 + 1.21, 2.6, D / 2 - 1.9, Math.PI / 2)
@@ -365,19 +437,17 @@ export class Boutique {
   }
 
   /**
-   * Two rows of frames on three walls (64 places). Filled eye-level first — back wall (seen from
-   * the door), then left, then right — and only then the upper row, so a small catalogue still
-   * lands where people look.
+   * Two rows of frames on three walls (64 places), hung column by column: the eye-level frame,
+   * then the one above it. Back wall first (it faces the door), then left, then right, so a run
+   * of one category stays together on one stretch of wall under its sign.
    */
   private buildSlots(): Slot[] {
-    const row = (y: number): Slot[] => {
-      const out: Slot[] = []
-      for (const x of [-2.4, 2.4, -3.3, 3.3, -4.2, 4.2, -5.1, 5.1]) out.push({ pos: new THREE.Vector3(x, y, -D / 2 + 0.06), normal: new THREE.Vector3(0, 0, 1) })
-      for (let z = -D / 2 + 1.0; z <= D / 2 - 3.0; z += 0.86) out.push({ pos: new THREE.Vector3(-W / 2 + 0.06, y, z), normal: new THREE.Vector3(1, 0, 0) })
-      for (let z = -D / 2 + 1.0; z <= D / 2 - 3.0; z += 0.86) out.push({ pos: new THREE.Vector3(W / 2 - 0.06, y, z), normal: new THREE.Vector3(-1, 0, 0) })
-      return out
-    }
-    return [...row(1.3), ...row(2.3)]
+    const cols: { x: number; z: number; n: THREE.Vector3 }[] = []
+    for (const x of [-2.4, -3.3, -4.2, -5.1]) cols.push({ x, z: -D / 2 + 0.06, n: new THREE.Vector3(0, 0, 1) })
+    for (let z = -D / 2 + 1.0; z <= D / 2 - 3.0; z += 0.86) cols.push({ x: -W / 2 + 0.06, z, n: new THREE.Vector3(1, 0, 0) })
+    for (const x of [2.4, 3.3, 4.2, 5.1]) cols.push({ x, z: -D / 2 + 0.06, n: new THREE.Vector3(0, 0, 1) })
+    for (let z = -D / 2 + 1.0; z <= D / 2 - 3.0; z += 0.86) cols.push({ x: W / 2 - 0.06, z, n: new THREE.Vector3(-1, 0, 0) })
+    return cols.flatMap((c) => [1.3, 2.3].map((y) => ({ pos: new THREE.Vector3(c.x, y, c.z), normal: c.n })))
   }
 
   // ------------------------------------------------------------------ movement
@@ -455,15 +525,17 @@ export class Boutique {
 
   private hover(e: PointerEvent) {
     if (e.pointerType !== "mouse") return
-    const hit = this.ray(e.clientX, e.clientY).intersectObjects(this.pickables, false)[0]
+    const hit = this.ray(e.clientX, e.clientY).intersectObjects([...this.pickables, this.counter, this.curtain], false)[0]
     this.hoverEl.style.cursor = hit ? "pointer" : "grab"
   }
 
   private tap(x: number, y: number) {
     const rc = this.ray(x, y)
-    const hits = rc.intersectObjects([...this.pickables, this.floor], false)
+    const hits = rc.intersectObjects([...this.pickables, this.floor, this.counter, this.curtain], false)
     const h = hits[0]
     if (!h) return
+    if (h.object === this.counter) { this.ev.onCounter(); return }
+    if (h.object === this.curtain) { this.ev.onFitting(); return }
     if (h.object !== this.floor) { this.select(h.object.userData.index as number); return }
     // walk to the tapped spot (keep looking the same way unless it is behind the shoulder)
     const to = this.clampInside(h.point.clone().setY(EYE))
@@ -602,6 +674,53 @@ function placeholderTexture(category: string) {
   g.fillText(category.toUpperCase().split("").join(" "), 150, 250)
   const t = new THREE.CanvasTexture(c)
   t.colorSpace = THREE.SRGBColorSpace
+  return t
+}
+
+/** All hang tags in one texture: 4 x 16 slots of 256 x 96. */
+function tagAtlas(items: BoutiqueItem[]) {
+  const c = document.createElement("canvas")
+  c.width = 1024; c.height = 1536
+  const g = c.getContext("2d")!
+  items.forEach((it, i) => {
+    const x = (i % 4) * 256, y = Math.floor(i / 4) * 96
+    g.fillStyle = "#F7F1E8"
+    g.beginPath(); g.roundRect(x + 6, y + 6, 244, 84, 10); g.fill()
+    g.fillStyle = "#b99a62"; g.beginPath(); g.arc(x + 26, y + 48, 7, 0, Math.PI * 2); g.fill()
+    const flag = it.onSale ? "SALE" : it.badge ? it.badge.toUpperCase().slice(0, 10) : ""
+    g.fillStyle = "#1A1611"; g.textBaseline = "middle"; g.textAlign = "left"
+    g.font = '700 34px "Inter", sans-serif'
+    g.fillText(`${it.price.toLocaleString("en-US")} Ks`, x + 44, y + (flag ? 36 : 48))
+    if (flag) {
+      g.fillStyle = it.onSale ? "#c23a4a" : "#2f4a36"
+      g.font = '700 20px "Inter", sans-serif'
+      g.fillText(flag, x + 44, y + 70)
+    }
+  })
+  const tex = new THREE.CanvasTexture(c)
+  tex.colorSpace = THREE.SRGBColorSpace
+  tex.anisotropy = 4
+  return { tex, uv: (i: number) => new THREE.Vector4(((i % 4) * 256) / 1024, 1 - ((Math.floor(i / 4) + 1) * 96) / 1536, ((i % 4) * 256 + 256) / 1024, 1 - (Math.floor(i / 4) * 96) / 1536) }
+}
+
+function tagPlane(w: number, h: number, slot: THREE.Vector4) {
+  const geo = new THREE.PlaneGeometry(w, h)
+  const uv = geo.getAttribute("uv") as THREE.BufferAttribute
+  for (let i = 0; i < uv.count; i++) uv.setXY(i, slot.x + uv.getX(i) * (slot.z - slot.x), slot.y + uv.getY(i) * (slot.w - slot.y))
+  return geo
+}
+
+function signTexture(en: string, mm: string) {
+  const c = document.createElement("canvas")
+  c.width = 512; c.height = 176
+  const g = c.getContext("2d")!
+  g.fillStyle = "#1A1611"; g.textAlign = "center"; g.textBaseline = "middle"
+  g.font = '600 64px "Playfair Display", Georgia, serif'
+  g.fillText(en, 256, mm ? 64 : 88)
+  if (mm) { g.font = '500 44px "Noto Sans Myanmar", sans-serif'; g.fillText(mm, 256, 132) }
+  const t = new THREE.CanvasTexture(c)
+  t.colorSpace = THREE.SRGBColorSpace
+  t.anisotropy = 4
   return t
 }
 
