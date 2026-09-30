@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { Link } from "react-router-dom"
 import { ArrowLeft, ChevronLeft, ChevronRight, Share2, ShoppingBag, X } from "lucide-react"
 import { toast } from "sonner"
-import { Boutique as Engine } from "@/boutique/engine"
+import { Boutique as Engine, type GirlPose } from "@/boutique/engine"
 import { useProducts } from "@/lib/useProducts"
 import { useLang } from "@/lib/lang"
 import { useCart } from "@/lib/cart"
@@ -14,6 +14,20 @@ import SizeGuide from "@/components/SizeGuide"
 const WALL_ORDER = ["Dresses", "Tops", "Cardigans", "Sweaters", "Jeans"]
 
 const ks = (n: number) => `${n.toLocaleString("en-US")} Ks`
+
+/** What the shop girl says. [Burmese, English] */
+const LINES = {
+  hello: ["မင်္ဂလာပါရှင့် — Sinar ကနေ ကြိုဆိုပါတယ် 💕", "Hello! Welcome to Sinar 💕"],
+  pieces: [
+    ["ဒါလေး အရမ်းလှတယ်နော်", "This one is so pretty"],
+    ["ဒီအရောင်လေး ကိုယ်အကြိုက်ဆုံးပဲ", "This colour is my favourite"],
+    ["ဆိုဒ် မသေချာရင် ကန့်လန့်ကာကို နှိပ်ကြည့်နော်", "Not sure of your size? Tap the curtain"],
+    ["ဒါလေးက ဂျင်းနဲ့ တွဲဝတ်ရင် လှတယ်", "Lovely with your own jeans"],
+    ["သူငယ်ချင်းကို share လုပ်ပြီး မေးကြည့်လို့ရတယ်နော်", "Share it with a friend and ask"],
+  ],
+  added: ["ကျေးဇူးတင်ပါတယ်ရှင့် — counter မှာ ငွေရှင်းလို့ရပါတယ်", "Thank you! Pay at the counter whenever you like"],
+  counter: ["Viber နဲ့ မှာလိုက်ရင် ချက်ချင်း ပို့ပေးမယ်နော်", "Order on Viber and we'll send it right away"],
+} as const
 
 /**
  * /boutique — walk into Sinar. The room and every framed piece come from the same catalogue as
@@ -38,6 +52,20 @@ export default function BoutiquePage() {
   const [progress, setProgress] = useState<[number, number]>([0, 1])
   const [ready, setReady] = useState(false)
   const [hint, setHint] = useState(true)
+  const [girl, setGirl] = useState(false)
+  const [speech, setSpeech] = useState<string | null>(null)
+  const speechTimer = useRef(0)
+  const lineN = useRef(0)
+  const say = (line: readonly [string, string], pose: GirlPose, ms = 3600) => {
+    const e = engine.current
+    if (!e) return
+    e.setGirl(pose)
+    setSpeech(lang === "mm" ? line[0] : line[1])
+    window.clearTimeout(speechTimer.current)
+    speechTimer.current = window.setTimeout(() => { setSpeech(null); engine.current?.setGirl("idle") }, ms)
+  }
+  const sayRef = useRef(say)
+  sayRef.current = say
 
   const items = useMemo(() => products.map((p) => ({
     id: p.id, img: p.image_url || FALLBACK_IMG, soldOut: !!p.sold_out, category: p.category,
@@ -60,9 +88,16 @@ export default function BoutiquePage() {
     ]).catch(() => undefined).finally(() => {
       if (!alive || !canvas.current) return
       engine.current = new Engine(canvas.current, {
-        onSelect: (i) => { setSel(i); setSize(undefined); setHint(false) },
+        onSelect: (i) => {
+          setSel(i); setSize(undefined); setHint(false)
+          if (i !== null) sayRef.current(LINES.pieces[lineN.current++ % LINES.pieces.length], "show")
+        },
         onProgress: (l, n) => setProgress([l, n]),
-        onCounter: () => setOpen(true),
+        onCounter: () => { setOpen(true); sayRef.current(LINES.counter, "wave") },
+        onGirl: (present) => {
+          setGirl(present)
+          if (present) window.setTimeout(() => sayRef.current(LINES.hello, "wave", 4200), 900)
+        },
         onFitting: () => setSizeGuide(true),
       })
       if (import.meta.env.DEV) (window as unknown as { __boutique: Engine }).__boutique = engine.current // test hook
@@ -113,6 +148,7 @@ export default function BoutiquePage() {
     if (!p) return
     if (p.sizes?.length && !size) { toast(t("ဆိုဒ် ရွေးပေးပါ", "Pick a size first")); return }
     add({ id: p.id, name_en: p.name_en, name_mm: p.name_mm, price: p.price, image_url: p.image_url, size })
+    say(LINES.added, "thanks")
     toast(t("ခြင်းထဲ ထည့်ပြီးပါပြီ", "Added to your bag"))
   }
 
@@ -134,6 +170,15 @@ export default function BoutiquePage() {
           {count > 0 && <span className="rounded-full bg-[#e79aa8] px-1.5 text-xs font-semibold text-[#2A0E17]">{count}</span>}
         </button>
       </div>
+
+      {/* the shop girl's speech bubble */}
+      {girl && speech && (
+        <div className="pointer-events-none absolute inset-x-0 top-24 flex justify-center px-4">
+          <div className={`relative max-w-sm rounded-2xl bg-[#F3EEE4] px-4 py-2.5 text-center text-sm text-[#1A1611] shadow-lg ${lang === "mm" ? "font-mm" : ""}`}>
+            <span className="mr-1.5 font-script text-[#C28773]">Sinar</span>{speech}
+          </div>
+        </div>
+      )}
 
       {/* how to move */}
       {hint && loaded && !p && (

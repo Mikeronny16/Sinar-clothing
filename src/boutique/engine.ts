@@ -28,7 +28,12 @@ export interface BoutiqueEvents {
   onCounter: () => void
   /** the fitting-room curtain was tapped: show the size guide */
   onFitting: () => void
+  /** the shop girl's pictures loaded (true) or are not there yet (false) */
+  onGirl?: (present: boolean) => void
 }
+
+export type GirlPose = "idle" | "wave" | "show" | "thanks"
+const POSES: GirlPose[] = ["idle", "wave", "show", "thanks"]
 
 /** Wall signs: English over Burmese. Unknown categories fall back to their own name. */
 const CATEGORY_MM: Record<string, string> = {
@@ -70,6 +75,10 @@ export class Boutique {
   private counter!: THREE.Mesh
   private curtain!: THREE.Mesh
   private signs = new THREE.Group()
+  private girl: THREE.Mesh | null = null
+  private girlTex: Partial<Record<GirlPose, THREE.Texture>> = {}
+  private girlPose: GirlPose = "idle"
+  private girlBob = 0
 
   constructor(private canvas: HTMLCanvasElement, private ev: BoutiqueEvents) {
     this.hoverEl = canvas
@@ -92,6 +101,7 @@ export class Boutique {
     this.soldTex = labelTexture("SOLD OUT", "#1A1611", "#F3EEE4")
     this.floor = this.buildRoom()
     this.scene.add(this.products, this.signs)
+    this.loadGirl()
     this.slots = this.buildSlots()
 
     this.resize()
@@ -236,6 +246,44 @@ export class Boutique {
       g.add(face)
       this.signs.add(g)
     })
+  }
+
+  // ------------------------------------------------------------------ the shop girl
+
+  /**
+   * She is four painted cut-outs on solid blue (public/boutique/girl-*.png). The blue is keyed out
+   * here, so the files can be dropped in as generated. If any pose is missing she simply isn't
+   * there — the shop works the same without her.
+   */
+  private async loadGirl() {
+    const imgs = await Promise.all(POSES.map((p) => loadImage(`/boutique/girl-${p}.png`)))
+    if (this.disposed) return
+    if (imgs.some((i) => !i)) { this.ev.onGirl?.(false); return }
+    let aspect = 0.5625
+    POSES.forEach((p, k) => {
+      const img = imgs[k]!
+      aspect = img.width / img.height
+      this.girlTex[p] = keyBlue(img)
+    })
+    // stands behind the counter, feet hidden by it; a 1.62 m girl
+    const h = 1.62
+    const geo = new THREE.PlaneGeometry(h * aspect, h)
+    geo.translate(0, h / 2, 0)
+    const mat = new THREE.MeshBasicMaterial({ map: this.girlTex.idle!, transparent: true, alphaTest: 0.02, toneMapped: false })
+    this.girl = new THREE.Mesh(geo, mat)
+    this.girl.position.set(0, 0.02, -D / 2 + 0.62)
+    this.girl.renderOrder = 1
+    this.scene.add(this.girl)
+    this.ev.onGirl?.(true)
+    this.dirty = true
+  }
+
+  setGirl(pose: GirlPose) {
+    if (!this.girl || !this.girlTex[pose] || pose === this.girlPose) return
+    this.girlPose = pose
+    ;(this.girl.material as THREE.MeshBasicMaterial).map = this.girlTex[pose]!
+    this.girlBob = 0.25            // a small hop into the new pose
+    this.dirty = true
   }
 
   /** Stand in front of a piece by id (share links). Returns false when it isn't hung. */
@@ -586,6 +634,11 @@ export class Boutique {
       this.glide = null
       this.dirty = true
     }
+    if (this.girl && this.girlBob > 0) {
+      this.girlBob = Math.max(0, this.girlBob - dt)
+      this.girl.position.y = 0.02 + Math.sin((0.25 - this.girlBob) / 0.25 * Math.PI) * 0.03
+      this.dirty = true
+    }
     if (!this.dirty) return
     this.dirty = false
     this.camera.position.copy(this.pos)
@@ -718,6 +771,44 @@ function signTexture(en: string, mm: string) {
   g.font = '600 64px "Playfair Display", Georgia, serif'
   g.fillText(en, 256, mm ? 64 : 88)
   if (mm) { g.font = '500 44px "Noto Sans Myanmar", sans-serif'; g.fillText(mm, 256, 132) }
+  const t = new THREE.CanvasTexture(c)
+  t.colorSpace = THREE.SRGBColorSpace
+  t.anisotropy = 4
+  return t
+}
+
+function loadImage(src: string) {
+  return new Promise<HTMLImageElement | null>((res) => {
+    const img = new Image()
+    img.onload = () => res(img.naturalWidth > 0 ? img : null)
+    img.onerror = () => res(null)
+    img.src = src
+  })
+}
+
+/**
+ * Solid-blue background -> transparent. Blueness = b - max(r, g): clear blue goes, a soft band
+ * feathers the edge, and blue spill on hair and skin is pulled back to neutral.
+ */
+function keyBlue(img: HTMLImageElement) {
+  const max = 1024
+  const k = Math.min(1, max / Math.max(img.width, img.height))
+  const c = document.createElement("canvas")
+  c.width = Math.round(img.width * k); c.height = Math.round(img.height * k)
+  const g = c.getContext("2d", { willReadFrequently: true })!
+  g.drawImage(img, 0, 0, c.width, c.height)
+  const d = g.getImageData(0, 0, c.width, c.height)
+  const px = d.data
+  for (let i = 0; i < px.length; i += 4) {
+    const r = px[i], gg = px[i + 1], b = px[i + 2]
+    const blue = b - Math.max(r, gg)
+    if (blue > 30) {
+      const a = Math.max(0, Math.min(1, 1 - (blue - 30) / 90))
+      px[i + 3] = Math.round(px[i + 3] * a)
+      px[i + 2] = Math.max(r, gg)          // despill
+    }
+  }
+  g.putImageData(d, 0, 0)
   const t = new THREE.CanvasTexture(c)
   t.colorSpace = THREE.SRGBColorSpace
   t.anisotropy = 4
