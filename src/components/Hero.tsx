@@ -83,7 +83,7 @@ export default function Hero() {
           style={{ fontFamily: SERIF }}
         >
           <span className="italic">Lovely little things,</span>{" "}
-          <span className="italic" style={{ color: ACCENT }}>made in Yangon.</span>
+          <span className="italic" style={{ color: ACCENT }}>made in Myitkyina.</span>
         </motion.p>
 
         {/* CTAs */}
@@ -111,7 +111,7 @@ export default function Hero() {
         <div className="flex animate-marquee whitespace-nowrap">
           {Array.from({ length: 2 }).map((_, r) => (
             <div key={r} className="flex items-center">
-              {["LOVELY LITTLE THINGS", "MADE IN YANGON", "SOFT & CHIC", "NEW SEASON 2025", "ORDER VIA DM"].map((w) => (
+              {["LOVELY LITTLE THINGS", "MADE IN MYITKYINA", "SOFT & CHIC", "NEW SEASON 2025", "ORDER VIA DM"].map((w) => (
                 <span key={w + r} className="flex items-center">
                   <span className="px-6 text-[11px] font-medium uppercase tracking-[0.32em] text-[#F3EEE4]/70">{w}</span>
                   <span style={{ color: ACCENT }}>✦</span>

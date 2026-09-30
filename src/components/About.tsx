@@ -62,7 +62,7 @@ export default function About() {
               <p>
                 {t(
                   "ကျွန်မတို့ တည်ဆောက်ထားသော lookbook တိုင်းမှာ ခေတ်မှီဒီဇိုင်းများနှင့် သဘာဝပတ်ဝန်းကျင်ကို လေးစားသော ဖန်တီးမှုများ ပေါင်းစပ်ပါဝင်သည်။ ရွေးချယ်မှုတစ်ခုချင်းစီတိုင်းက သင့်တစ်နေ့တာကို စတိုင်လ်ကျကျ ဖြတ်သန်းနိုင်စေရန် ရည်ရွယ်သည်။",
-                  "Each capsule contains versatile basics and statement wraps designed to transition seamlessly from quiet afternoons to elegant evenings, with free delivery within Yangon."
+                  "Each capsule contains versatile basics and statement wraps designed to transition seamlessly from quiet afternoons to elegant evenings, with free delivery within Myitkyina."
                 )}
               </p>
             </div>

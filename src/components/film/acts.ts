@@ -17,9 +17,9 @@ export const ACTS: ActData[] = [
     head_mm: ["ဒီမှာရှိသမျှကို", "သူကိုယ်တိုင် ဝတ်မယ့်အရာချည်းပါ။"],
     head_en: ["Everything here,", "she would wear herself."],
     body_mm:
-      "ရန်ကုန်က အခန်းငယ်လေးတစ်ခန်းထဲကနေ တစ်ထည်ချင်း ရွေးထားတဲ့ ဝတ်စုံ ၄၉ မျိုး။ ဆိုင်ကြီးတစ်ဆိုင်လုံးကို လူတစ်ယောက်တည်းက ရွေးထားတာပါ။",
+      "မြစ်ကြီးနားက အခန်းငယ်လေးတစ်ခန်းထဲကနေ တစ်ထည်ချင်း ရွေးထားတဲ့ ဝတ်စုံ ၄၉ မျိုး။ ဆိုင်ကြီးတစ်ဆိုင်လုံးကို လူတစ်ယောက်တည်းက ရွေးထားတာပါ။",
     body_en:
-      "Forty-nine pieces, chosen one at a time, out of a small room in Yangon. One person picked every one of them.",
+      "Forty-nine pieces, chosen one at a time, out of a small room in Myitkyina. One person picked every one of them.",
     sign_mm: "— Sinar",
     sign_en: "— Sinar",
     art: "/story/cover.jpg",
@@ -33,9 +33,9 @@ export const ACTS: ActData[] = [
     head_mm: ["ဝတ်စုံတန်း တစ်ခု။", "အခန်းငယ် တစ်ခန်း။"],
     head_en: ["One rail.", "One small room."],
     body_mm:
-      "ရန်ကုန်မှာ သူ့အရွယ် မိန်းကလေးတစ်ယောက် တတ်နိုင်တဲ့ဈေးနဲ့ ဒီလိုအင်္ကျီမျိုး ရှာမတွေ့လို့ ကိုယ်တိုင် ရွေးလာခဲ့တာပါ။",
+      "မြစ်ကြီးနားမှာ သူ့အရွယ် မိန်းကလေးတစ်ယောက် တတ်နိုင်တဲ့ဈေးနဲ့ ဒီလိုအင်္ကျီမျိုး ရှာမတွေ့လို့ ကိုယ်တိုင် ရွေးလာခဲ့တာပါ။",
     body_en:
-      "It began because a girl in Yangon could not find these anywhere else at a price she could actually pay. So she went and found them herself.",
+      "It began because a girl in Myitkyina could not find these anywhere else at a price she could actually pay. So she went and found them herself.",
     art: "/story/plate-01-rack.jpg",
     tone: "dark",
     align: "right",
@@ -75,9 +75,9 @@ export const ACTS: ActData[] = [
     head_mm: ["တစ်နှစ်ကုန်ခါနီး", "ညတွေ အေးလာတဲ့အခါ။"],
     head_en: ["When the year turns", "and the nights go cool."],
     body_mm:
-      "ရန်ကုန်မှာ အေးတဲ့ရက် အနည်းငယ်ပဲ ရှိတယ်။ အဲဒီရက်လေးတွေအတွက် ဆွယ်တာနဲ့ ကာဒီဂန် အနည်းငယ်ပဲ ရွေးထားပါတယ် — ဝတ်ချင်စရာ ကောင်းတဲ့ တစ်ထည်နှစ်ထည်ပဲ။",
+      "မြစ်ကြီးနားမှာ ဆောင်းတွင်းက တကယ့်ကို အေးတယ်။ အဲဒီရက်တွေအတွက် ဆွယ်တာနဲ့ ကာဒီဂန် အနည်းငယ်ပဲ ရွေးထားပါတယ် — ဝတ်ချင်စရာ ကောင်းတဲ့ တစ်ထည်နှစ်ထည်ပဲ။",
     body_en:
-      "Yangon is only cold for a few weeks. There are six knits in the whole shop, chosen for exactly those weeks.",
+      "Myitkyina gets genuinely cold. There are six knits in the whole shop, chosen for exactly those weeks.",
     art: "/story/plate-08-knit.jpg",
     tone: "dark",
     align: "left",

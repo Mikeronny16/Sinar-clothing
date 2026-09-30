@@ -53,7 +53,7 @@ export default function Film() {
         <p className={`max-w-lg text-sm text-text-sub mb-12 ${lang === "mm" ? "font-mm" : ""}`}>
           {t(
             "Sinar ၏ ဆောင်းဦးဝတ်စုံများကို လှုပ်ရှားမှုဖြင့် ကြည့်ရှုပါ — ကမ်ပိန်း၊ အက်တလီယာ အတွင်းပိုင်းနှင့် လမ်းပေါ် ရုပ်ရှင်တိုများ။",
-            "Our collection, in motion — campaigns, atelier stories and short films shot around Yangon.",
+            "Our collection, in motion — campaigns, atelier stories and short films shot around Myitkyina.",
           )}
         </p>
 

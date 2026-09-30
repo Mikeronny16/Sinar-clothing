@@ -47,8 +47,8 @@ export const DEFAULT_FILMS: Film[] = [
   },
   {
     id: "street",
-    title_en: "Yangon, After Hours",
-    title_mm: "ရန်ကုန် ည",
+    title_en: "Myitkyina, After Hours",
+    title_mm: "မြစ်ကြီးနား ည",
     tag_en: "Film",
     tag_mm: "ရုပ်ရှင်တို",
     runtime: "0:56",

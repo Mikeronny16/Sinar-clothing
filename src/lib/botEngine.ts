@@ -101,7 +101,7 @@ const DEMO_ORDERS: Record<string, OrderTrackingResult> = {
     status_en: "Out for Delivery (On the way)",
     courier: "Royal Express Courier",
     trackingNo: "REX-882910-MM",
-    township: "Kamayut, Yangon",
+    township: "Shansu, Myitkyina",
     eta: "ယနေ့ ညနေ ၄:၀၀ နာရီမတိုင်မီ",
     items: [
       { name: "Floral Linen Blouse", price: 18000, qty: 1 },
@@ -124,7 +124,7 @@ const DEMO_ORDERS: Record<string, OrderTrackingResult> = {
     status_en: "Out for Delivery (On the way)",
     courier: "Royal Express Courier",
     trackingNo: "REX-882910-MM",
-    township: "Kamayut, Yangon",
+    township: "Shansu, Myitkyina",
     eta: "ယနေ့ ညနေ ၄:၀၀ နာရီမတိုင်မီ",
     items: [
       { name: "Floral Linen Blouse", price: 18000, qty: 1 },
@@ -155,7 +155,7 @@ export function lookupOrder(queryInput: string): OrderTrackingResult {
     status_en: "In Transit with Courier",
     courier: "Sinar Express Partner",
     trackingNo: `SN-EXP-${Math.floor(100000 + Math.random() * 900000)}`,
-    township: "Yangon / Mandalay",
+    township: "Myitkyina / Kachin",
     eta: "၁-၂ ရက်အတွင်း အိမ်အရောက်",
     items: [
       { name: "Pastel Midi Dress", price: 28000, qty: 1 },
@@ -375,43 +375,40 @@ export function evaluateQuizResult(answers: string[]): StylePersonaResult {
 // ── Townships Delivery Knowledge ──
 export interface TownshipDeliveryInfo {
   name: string
-  region: "Yangon" | "Mandalay" | "Other"
+  region: "Myitkyina" | "Kachin" | "Other"
   fee: number
   eta: string
   cod: boolean
 }
 
 export const TOWNSHIPS: TownshipDeliveryInfo[] = [
-  // Yangon
-  { name: "Kamayut (ကမာရွတ်)", region: "Yangon", fee: 2500, eta: "1-2 Days", cod: true },
-  { name: "Bahan (ဗဟန်း)", region: "Yangon", fee: 2500, eta: "1-2 Days", cod: true },
-  { name: "Sanchaung (စမ်းချောင်း)", region: "Yangon", fee: 2500, eta: "1-2 Days", cod: true },
-  { name: "Hledan (လှည်းတန်း)", region: "Yangon", fee: 2500, eta: "1-2 Days", cod: true },
-  { name: "Yankin (ရန်ကင်း)", region: "Yangon", fee: 2500, eta: "1-2 Days", cod: true },
-  { name: "Mayangone (မရမ်းကုန်း)", region: "Yangon", fee: 2500, eta: "1-2 Days", cod: true },
-  { name: "South Okkalapa (တောင်ဥက္ကလာ)", region: "Yangon", fee: 3000, eta: "1-2 Days", cod: true },
-  { name: "North Okkalapa (မြောက်ဥက္ကလာ)", region: "Yangon", fee: 3000, eta: "1-2 Days", cod: true },
-  { name: "Dagon (ဒဂုံ)", region: "Yangon", fee: 2500, eta: "1-2 Days", cod: true },
-  { name: "Insein (အင်းစိန်)", region: "Yangon", fee: 3000, eta: "1-2 Days", cod: true },
-  { name: "Kyauktada / Downtown (ကျောက်တံတား)", region: "Yangon", fee: 2500, eta: "1-2 Days", cod: true },
-  { name: "Thaketa (သာကေတ)", region: "Yangon", fee: 3000, eta: "1-2 Days", cod: true },
-  { name: "Thingangyun (သင်္ဃန်းကျွန်း)", region: "Yangon", fee: 3000, eta: "1-2 Days", cod: true },
-  { name: "Tamwe (တာမွေ)", region: "Yangon", fee: 2500, eta: "1-2 Days", cod: true },
-  { name: "Hlaing (လှိုင်)", region: "Yangon", fee: 2500, eta: "1-2 Days", cod: true },
+  // Myitkyina (in town)
+  { name: "Shansu (ရှမ်းစု)", region: "Myitkyina", fee: 2000, eta: "Same Day - 1 Day", cod: true },
+  { name: "Thida (သီတာ)", region: "Myitkyina", fee: 2000, eta: "Same Day - 1 Day", cod: true },
+  { name: "Tatkone (တပ်ကုန်း)", region: "Myitkyina", fee: 2000, eta: "Same Day - 1 Day", cod: true },
+  { name: "Shatapru (ရှတားပရူ)", region: "Myitkyina", fee: 2000, eta: "Same Day - 1 Day", cod: true },
+  { name: "Aungnan (အောင်နန်း)", region: "Myitkyina", fee: 2000, eta: "Same Day - 1 Day", cod: true },
+  { name: "Zay Gyi / Downtown (ဈေးကြီး)", region: "Myitkyina", fee: 2000, eta: "Same Day - 1 Day", cod: true },
+  { name: "Dukahtaung (ဒူးခေါင်တောင်)", region: "Myitkyina", fee: 2500, eta: "1 Day", cod: true },
+  { name: "Sitapu (ဆီတာပူး)", region: "Myitkyina", fee: 2500, eta: "1 Day", cod: true },
+  { name: "Myothit (မြို့သစ်)", region: "Myitkyina", fee: 2500, eta: "1 Day", cod: true },
+  { name: "Pamati (ပမ်းမတီး)", region: "Myitkyina", fee: 2500, eta: "1 Day", cod: true },
 
-  // Mandalay
-  { name: "Chanayethazan (ချမ်းအေးသာစံ)", region: "Mandalay", fee: 3500, eta: "2-3 Days", cod: true },
-  { name: "Maha Aungmye (မဟာအောင်မြေ)", region: "Mandalay", fee: 3500, eta: "2-3 Days", cod: true },
-  { name: "Aungmyethazan (အောင်မြေသာစံ)", region: "Mandalay", fee: 3500, eta: "2-3 Days", cod: true },
-  { name: "Pyigyidagun (ပြည်ကြီးတံခွန်)", region: "Mandalay", fee: 4000, eta: "2-3 Days", cod: true },
-  { name: "Chanmyathazi (ချမ်းမြသာစည်)", region: "Mandalay", fee: 3500, eta: "2-3 Days", cod: true },
+  // Kachin State
+  { name: "Waingmaw (ဝိုင်းမော်)", region: "Kachin", fee: 3000, eta: "1-2 Days", cod: true },
+  { name: "Mohnyin (မိုးညှင်း)", region: "Kachin", fee: 3500, eta: "2-3 Days", cod: false },
+  { name: "Moegaung (မိုးကောင်း)", region: "Kachin", fee: 3500, eta: "2-3 Days", cod: false },
+  { name: "Bhamo (ဗန်းမော်)", region: "Kachin", fee: 4000, eta: "2-3 Days", cod: false },
+  { name: "Hpakant (ဖားကန့်)", region: "Kachin", fee: 4000, eta: "2-3 Days", cod: false },
+  { name: "Putao (ပူတာအို)", region: "Kachin", fee: 5000, eta: "3-4 Days", cod: false },
 
   // Other Regions
-  { name: "Naypyidaw (နေပြည်တော်)", region: "Other", fee: 4500, eta: "2-3 Days", cod: false },
+  { name: "Mandalay (မန္တလေး)", region: "Other", fee: 4500, eta: "2-3 Days", cod: false },
+  { name: "Yangon (ရန်ကုန်)", region: "Other", fee: 5000, eta: "3-4 Days", cod: false },
+  { name: "Naypyidaw (နေပြည်တော်)", region: "Other", fee: 5000, eta: "3-4 Days", cod: false },
+  { name: "Lashio (လားရှိုး)", region: "Other", fee: 4500, eta: "3 Days", cod: false },
   { name: "Taunggyi (တောင်ကြီး)", region: "Other", fee: 5000, eta: "3-4 Days", cod: false },
-  { name: "Mawlamyine (မော်လမြိုင်)", region: "Other", fee: 4500, eta: "2-3 Days", cod: false },
-  { name: "Bago (ပဲခူး)", region: "Other", fee: 4000, eta: "2 Days", cod: false },
-  { name: "Pyin Oo Lwin (ပြင်ဦးလွင်)", region: "Other", fee: 4500, eta: "2-3 Days", cod: false },
+  { name: "Pyin Oo Lwin (ပြင်ဦးလွင်)", region: "Other", fee: 4500, eta: "3 Days", cod: false },
   { name: "Other Township (အခြားမြို့နယ်များ - ဂိတ်ချ)", region: "Other", fee: 4500, eta: "2-4 Days", cod: false },
 ]
 
@@ -671,12 +668,12 @@ function localBotEngine(
   }
 
   // ── 9. DELIVERY & SHIPPING ──
-  if (query.includes("delivery") || query.includes("deli") || query.includes("ပို့ခ") || query.includes("ပို့ဆောင်") || query.includes("ship") || query.includes("yangon") || query.includes("mandalay")) {
+  if (query.includes("delivery") || query.includes("deli") || query.includes("ပို့ခ") || query.includes("ပို့ဆောင်") || query.includes("ship") || query.includes("myitkyina") || query.includes("မြစ်ကြီးနား") || query.includes("kachin") || query.includes("yangon") || query.includes("mandalay")) {
     return {
       sender: "bot",
       text: isMm
-        ? "🚚 **ပို့ဆောင်ခနှင့် ကြာချိန်များ**:\n\n• **ရန်ကုန်မြို့တွင်း**: ၂,၅၀၀ ~ ၃,၅၀၀ Ks (၁-၂ ရက်အတွင်း အိမ်အရောက် ငွေချေ Cash on Delivery ရပါသည်)\n• **မန္တလေးမြို့တွင်း**: ၃,၅၀၀ ~ ၄,၅၀၀ Ks (၂-၃ ရက်အတွင်း)\n• **နယ်မြို့များ**: ဂိတ်ချ သို့မဟုတ် အမြန်ချောပို့ဖြင့် ပို့ဆောင်ပေးပါသည် (KPay / WavePay ဖြင့် ငွေလွှဲလက်ခံပါသည်)\n\nအော်ဒါတင်ချင်ပါက ကြိုက်နှစ်သက်ရာ ပစ္စည်းကို ရွေးချယ်ပြီး တိုက်ရိုက် ဝယ်ယူနိုင်ပါတယ်ရှင်! 🛍️"
-        : "🚚 **Delivery & Shipping Info**:\n\n• **Yangon**: 2,500 – 3,500 Ks (1–2 days, Cash on Delivery available)\n• **Mandalay**: 3,500 – 4,500 Ks (2–3 days)\n• **Other States/Regions**: Reliable highway bus gate / express courier delivery (KPay / WavePay accepted).\n\nYou can easily add items to bag or order directly via Messenger & Viber! 🛍️",
+        ? "🚚 **ပို့ဆောင်ခနှင့် ကြာချိန်များ**:\n\n• **မြစ်ကြီးနားမြို့တွင်း**: ၁,၀၀၀ ~ ၂,၅၀၀ Ks (တစ်ရက်အတွင်း အိမ်အရောက် ငွေချေ Cash on Delivery ရပါသည်)\n• **ကချင်ပြည်နယ်တွင်း** (ဝိုင်းမော်၊ မိုးညှင်း၊ ဗန်းမော်၊ ဖားကန့်): ၃,၀၀၀ ~ ၄,၀၀၀ Ks (၂-၃ ရက်အတွင်း)\n• **နယ်မြို့များ** (မန္တလေး၊ ရန်ကုန်၊ အခြားမြို့များ): ဂိတ်ချ သို့မဟုတ် အမြန်ချောပို့ဖြင့် ၄,၅၀၀ ~ ၅,၀၀၀ Ks (KPay / WavePay)\n\nအော်ဒါတင်ချင်ပါက ကြိုက်နှစ်သက်ရာ ပစ္စည်းကို ရွေးချယ်ပြီး တိုက်ရိုက် ဝယ်ယူနိုင်ပါတယ်ရှင်! 🛍️"
+        : "🚚 **Delivery & Shipping Info**:\n\n• **Myitkyina (in town)**: 2,000 – 2,500 Ks (same day–1 day, Cash on Delivery available)\n• **Kachin State** (Waingmaw, Mohnyin, Bhamo, Hpakant): 3,000 – 4,000 Ks (2–3 days)\n• **Mandalay / Yangon / other regions**: 4,500 – 5,000 Ks by highway bus gate or express courier (KPay / WavePay accepted).\n\nYou can easily add items to bag or order directly via Messenger & Viber! 🛍️",
       quickReplies: [
         { label_mm: "💳 ငွေပေးချေနည်းများ", label_en: "💳 Payment Methods", prompt: "How can I pay?" },
         { label_mm: "👗 ဝတ်စုံများ ကြည့်မည်", label_en: "👗 Browse Outfits", prompt: "Show me trending outfits" },
@@ -689,8 +686,8 @@ function localBotEngine(
     return {
       sender: "bot",
       text: isMm
-        ? "💳 **ငွေပေးချေမှု နည်းလမ်းများ**:\n\n1. **Cash on Delivery (COD)**: ရန်ကုန်နှင့် မန္တလေးမြို့တွင်း ပစ္စည်းရောက်မှ ငွေချေနိုင်ပါသည်\n2. **KBZPay / WavePay**: လွယ်ကူလျင်မြန်စွာ ငွေလွှဲပေးချေနိုင်ပါသည်\n3. **Mobile Banking**: KBZ, CB, AYA, A-Bank အားလုံး လက်ခံပါသည်\n\nမည်သည့် အခွန်/ထပ်ဆောင်းခမှ မရှိပါရှင် ✨"
-        : "💳 **Payment Methods**:\n\n1. **Cash on Delivery (COD)** available in Yangon & Mandalay\n2. **KBZPay & WavePay** instant transfers\n3. **Mobile Banking** (KBZ, CB, AYA, A-Bank)\n\nZero hidden fees & 100% secure! ✨",
+        ? "💳 **ငွေပေးချေမှု နည်းလမ်းများ**:\n\n1. **Cash on Delivery (COD)**: မြစ်ကြီးနားနှင့် ဝိုင်းမော်မြို့တွင်း ပစ္စည်းရောက်မှ ငွေချေနိုင်ပါသည်\n2. **KBZPay / WavePay**: လွယ်ကူလျင်မြန်စွာ ငွေလွှဲပေးချေနိုင်ပါသည်\n3. **Mobile Banking**: KBZ, CB, AYA, A-Bank အားလုံး လက်ခံပါသည်\n\nမည်သည့် အခွန်/ထပ်ဆောင်းခမှ မရှိပါရှင် ✨"
+        : "💳 **Payment Methods**:\n\n1. **Cash on Delivery (COD)** available in Myitkyina & Waingmaw\n2. **KBZPay & WavePay** instant transfers\n3. **Mobile Banking** (KBZ, CB, AYA, A-Bank)\n\nZero hidden fees & 100% secure! ✨",
       quickReplies: [
         { label_mm: "🛍️ Shop သို့ သွားမည်", label_en: "🛍️ Visit Shop", prompt: "Show all products" },
         { label_mm: "💬 Admin နှင့် တိုက်ရိုက်ပြောမည်", label_en: "💬 Chat with Admin", prompt: "Connect me with shop admin" },
@@ -863,12 +860,12 @@ async function callGeminiStylist(
     sizes: p.sizes,
   }))
 
-  const systemInstruction = `You are the chic, polite, and helpful AI Fashion Stylist & Sales Assistant for "Sinar Clothing" - an aesthetic boutique clothing brand in Myanmar.
+  const systemInstruction = `You are the chic, polite, and helpful AI Fashion Stylist & Sales Assistant for "Sinar Clothing" - an aesthetic boutique clothing brand based in Myitkyina, Kachin State, Myanmar.
 Language requested: ${isMm ? "Burmese (Myanmar Unicode)" : "English"}.
 Available products in catalog: ${JSON.stringify(catalogSummary)}.
 Key policies:
 - Wedding/Event/Gala dresses: Recommend Dresses (e.g. Pastel Midi Dress, Flowy Maxi Dress) paired with Cardigans.
-- Delivery: Yangon (2500-3500 Ks, COD 1-2 days), Mandalay (3500-4500 Ks), Other regions (Bus gate / express).
+- Delivery: Myitkyina in-town (2000-2500 Ks, COD same day-1 day), Kachin State towns (3000-4000 Ks), Mandalay / Yangon / other regions (4500-5000 Ks, bus gate / express).
 - Payment: KBZPay, WavePay, Mobile Banking, COD.
 - Phone/Viber: ${SITE.viber}, WhatsApp: ${SITE.whatsapp}.
 

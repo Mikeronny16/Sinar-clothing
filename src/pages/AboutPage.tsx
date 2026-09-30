@@ -17,7 +17,7 @@ export default function AboutPage() {
         <p className="mx-auto mt-5 max-w-xl font-mm text-sm leading-relaxed text-text-sub">
           {t(
             "Sinar က မြန်မာ့ အမျိုးသမီးများအတွက် ချစ်စရာ၊ အရည်အသွေးမြင့် ဝတ်စုံလေးများကို ရွေးချယ်ပေးနေတဲ့ boutique တစ်ခုပါ။",
-            "Sinar is a little Yangon boutique curating quality, charming outfits for the women of Myanmar — one lovely piece at a time."
+            "Sinar is a little Myitkyina boutique curating quality, charming outfits for the women of Myanmar — one lovely piece at a time."
           )}
         </p>
       </section>

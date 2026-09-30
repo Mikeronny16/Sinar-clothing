@@ -17,12 +17,12 @@ interface PurchaseNotification {
 }
 
 const BUYERS = [
-  { name: "Ma May Thet", township_mm: "ကမာရွတ်၊ ရန်ကုန်", township_en: "Kamayut, Yangon" },
-  { name: "Khin Thiri", township_mm: "ဗဟန်း၊ ရန်ကုန်", township_en: "Bahan, Yangon" },
+  { name: "Ma May Thet", township_mm: "ရှမ်းစု၊ မြစ်ကြီးနား", township_en: "Shansu, Myitkyina" },
+  { name: "Khin Thiri", township_mm: "သီတာ၊ မြစ်ကြီးနား", township_en: "Thida, Myitkyina" },
   { name: "Su Su Hlaing", township_mm: "မဟာအောင်မြေ၊ မန္တလေး", township_en: "Mandalay" },
-  { name: "Yoon Myat", township_mm: "စမ်းချောင်း၊ ရန်ကုန်", township_en: "Sanchaung, Yangon" },
+  { name: "Yoon Myat", township_mm: "တပ်ကုန်း၊ မြစ်ကြီးနား", township_en: "Tatkone, Myitkyina" },
   { name: "Phoo Pwint", township_mm: "တောင်ကြီး", township_en: "Taunggyi" },
-  { name: "Ei Mon", township_mm: "လှိုင်၊ ရန်ကုန်", township_en: "Hlaing, Yangon" },
+  { name: "Ei Mon", township_mm: "ဝိုင်းမော်", township_en: "Waingmaw" },
 ]
 
 export default function SocialProofPopup() {

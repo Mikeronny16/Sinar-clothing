@@ -16,10 +16,10 @@ const CARDS = [
     bodyMm: "ကြိုက်နှစ်သက်သည့် ဝတ်စုံတွေ့ရှိပါက Viber မှတစ်ဆင့် စာပို့၍ လွယ်ကူစွာ မှာယူနိုင်ပါသည်။",
   },
   {
-    en: "Yangon Delivery",
-    mm: "ရန်ကုန် ပို့ဆောင်",
-    bodyEn: "Fast, careful delivery across Yangon — and beautifully packed, because unboxing should feel special too.",
-    bodyMm: "ရန်ကုန်တစ်ဝှမ်း မြန်ဆန်စိတ်ချစွာ ပို့ဆောင်ပေးပြီး လက်ဆောင်ရသကဲ့သို့ လှပသေသပ်စွာ ထုပ်ပိုးပေးပါသည်။",
+    en: "Myitkyina Delivery",
+    mm: "မြစ်ကြီးနား ပို့ဆောင်",
+    bodyEn: "Fast, careful delivery across Myitkyina — and beautifully packed, because unboxing should feel special too.",
+    bodyMm: "မြစ်ကြီးနားတစ်ဝှမ်း မြန်ဆန်စိတ်ချစွာ ပို့ဆောင်ပေးပြီး လက်ဆောင်ရသကဲ့သို့ လှပသေသပ်စွာ ထုပ်ပိုးပေးပါသည်။",
   },
 ]
 
