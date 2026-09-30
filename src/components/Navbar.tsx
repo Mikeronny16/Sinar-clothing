@@ -29,6 +29,7 @@ export default function Navbar() {
 
   const links = [
     { to: "/shop", label: t("ရောင်းပစ္စည်း", "Shop") },
+    { to: "/boutique", label: t("3D ဆိုင်", "3D Shop") },
     { to: "/film", label: t("ဗီဒီယို", "Film") },
     { to: "/about", label: t("ကျွန်မတို့", "About") },
     { to: "/portfolio", label: t("ဖန်တီးသူ", "Founder") },

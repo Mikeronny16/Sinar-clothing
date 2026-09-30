@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react"
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Toaster } from "sonner"
@@ -11,6 +12,8 @@ import Saved from "./pages/Saved"
 import Portfolio from "./pages/Portfolio"
 import Auth from "./pages/Auth"
 import Admin from "./pages/Admin"
+// three.js only loads when someone walks into the 3D shop
+const Boutique = lazy(() => import("./pages/Boutique"))
 import CursorFollower from "./components/CursorFollower"
 import IntroLoader from "./components/IntroLoader"
 import CartDrawer from "./components/CartDrawer"
@@ -59,6 +62,7 @@ export default function App() {
                   <Route path="/classic" element={<HomeClassic />} />
                   <Route path="/saved" element={<Saved />} />
                   <Route path="/portfolio" element={<Portfolio />} />
+                  <Route path="/boutique" element={<Suspense fallback={<div className="fixed inset-0 z-[65] bg-[#1b2a20]" />}><Boutique /></Suspense>} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
                   <Route path="*" element={<Navigate to="/" replace />} />

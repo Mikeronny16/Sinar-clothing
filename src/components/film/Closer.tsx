@@ -84,6 +84,12 @@ export default function Closer() {
               >
                 {t("ဆိုင်ကြည့်မယ်", "Shop the collection")}
               </Link>
+              <Link
+                to="/boutique"
+                className="rounded-full border border-[color:var(--st-pink)] bg-[#FCF5F3]/10 px-7 py-3.5 text-sm font-semibold text-[color:var(--st-pink)] backdrop-blur transition-transform duration-300 hover:scale-105"
+              >
+                {t("3D ဆိုင်ထဲ ဝင်ကြည့်မယ်", "Walk into the shop · 3D")}
+              </Link>
               <a
                 href={viberLink()}
                 className="film-micro rounded-full border border-current px-6 py-3.5 opacity-80 transition-opacity hover:opacity-100"
