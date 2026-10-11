@@ -62,7 +62,12 @@ import type { Product } from "@/lib/supabase"
 const STORAGE_KEY = "sinar_bot_v2_history"
 type TabType = "chat" | "admin" | "quiz" | "studio" | "checkout"
 
-export default function AiStylistBot() {
+export const STYLIST_OPEN_EVENT = "sinar_open_stylist"
+export function openStylist() {
+  window.dispatchEvent(new Event(STYLIST_OPEN_EVENT))
+}
+
+export default function AiStylistBot({ hideFab = false }: { hideFab?: boolean }) {
   const { t, lang, toggle: toggleLang } = useLang()
   const { isDark } = useTheme()
   const { add: addToCart, items: cartItems } = useCart()
@@ -158,6 +163,13 @@ export default function AiStylistBot() {
     window.addEventListener(ADMIN_CHAT_EVENT, handleAdminReply)
     return () => window.removeEventListener(ADMIN_CHAT_EVENT, handleAdminReply)
   }, [lang])
+
+  // The app header's sparkle opens the stylist without the floating launcher.
+  useEffect(() => {
+    const open = () => setIsOpen(true)
+    window.addEventListener(STYLIST_OPEN_EVENT, open)
+    return () => window.removeEventListener(STYLIST_OPEN_EVENT, open)
+  }, [])
 
   // Scroll to bottom
   const scrollToBottom = () => {
@@ -540,6 +552,7 @@ export default function AiStylistBot() {
 
       {/* ── Ultra-Unique Haute Couture Floating Launcher ── */}
       <div
+        hidden={hideFab}
         className="fixed z-[70] right-4 sm:right-6 transition-all duration-300"
         style={{ bottom: "max(5.5rem, calc(env(safe-area-inset-bottom) + 5rem))" }}
       >

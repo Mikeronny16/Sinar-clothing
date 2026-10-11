@@ -38,6 +38,14 @@ export default {
         "green-brand": "#2D5A3D",
         "green-light": "#3D7A52",
         "cream-warm": "#FAF6EF",
+        // Korean shop-app skin (green + pink, her colours)
+        "k-green": "#1F3D2B",
+        "k-pink": "#E8739A",
+        "k-cream": "#FFF9F6",
+        "k-chip": "#F3EDE8",
+        "k-ink": "#1B1A17",
+        "k-sage": "#A9C7A4",
+        "k-blush": "#F7D7DF",
       },
       fontFamily: {
         serif: ["'Bricolage Grotesque'", "Inter", "system-ui", "sans-serif"],

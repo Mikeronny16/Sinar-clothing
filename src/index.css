@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Kaushan+Script&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Myanmar:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Kaushan+Script&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Myanmar:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -403,3 +403,8 @@
 /* The closing credits are the one readout that shares the floor with the
    stylist button, which comes back exactly there — so they sit higher. */
 .film-foot-lg { padding-bottom: calc(1rem + var(--foot, 0px) + 58px); }
+
+/* ── Korean shop-app skin ─────────────────────────────────────────── */
+.k-shimmer { background: linear-gradient(100deg, #F3EDE8 30%, #FBF6F2 50%, #F3EDE8 70%); background-size: 200% 100%; animation: k-shimmer 1.3s linear infinite; }
+.k-shimmer.is-loaded { animation: none; background: #F3EDE8; }
+@keyframes k-shimmer { from { background-position: 150% 0; } to { background-position: -50% 0; } }

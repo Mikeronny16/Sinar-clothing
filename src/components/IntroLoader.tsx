@@ -1,77 +1,62 @@
 import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
-const SERIF = '"Playfair Display", "Lora", Georgia, serif'
-const EASE: [number, number, number, number] = [0.76, 0, 0.24, 1]
+const KEY = "sinar_splash_seen"
 
-// Editorial intro: bone curtain, "Sinar" letters rise out of a mask, a
-// terracotta hairline draws across, then the whole curtain lifts away.
+function seen() {
+  try {
+    return sessionStorage.getItem(KEY) === "1"
+  } catch {
+    return false
+  }
+}
+
+// App splash: the logo settles in, the pink dot pops, and it gets out of the way.
+// Once per visit — opening a second page shouldn't make anyone wait again.
 export default function IntroLoader() {
-  const [done, setDone] = useState(false)
+  const [done, setDone] = useState(seen)
 
   useEffect(() => {
-    document.documentElement.style.overflow = "hidden"
-    const t = setTimeout(() => {
-      setDone(true)
-      document.documentElement.style.overflow = ""
-    }, 2600)
-    return () => {
-      clearTimeout(t)
-      document.documentElement.style.overflow = ""
+    if (done) return
+    try {
+      sessionStorage.setItem(KEY, "1")
+    } catch {
+      /* private mode */
     }
-  }, [])
-
-  const letters = "Sinar".split("")
+    const t = setTimeout(() => setDone(true), 1150)
+    return () => clearTimeout(t)
+  }, [done])
 
   return (
     <AnimatePresence>
       {!done && (
         <motion.div
-          className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#F3EEE4]"
-          exit={{ y: "-100%" }}
-          transition={{ duration: 0.9, ease: EASE }}
+          className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-k-cream"
+          exit={{ opacity: 0, scale: 1.04 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
           aria-hidden
         >
-          {/* kicker */}
           <motion.p
-            className="mb-5 text-[10px] uppercase tracking-[0.5em] text-[#1A1611]/45"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35, duration: 0.7 }}
+            initial={{ opacity: 0, scale: 0.9, y: 6 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            className="font-['Playfair_Display'] text-[56px] font-bold italic leading-none text-k-green"
           >
-            Myanmar Atelier
+            Sinar
+            <motion.span
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.4, type: "spring", stiffness: 600, damping: 12 }}
+              className="inline-block not-italic text-k-pink"
+            >
+              .
+            </motion.span>
           </motion.p>
-
-          {/* wordmark — letters rise out of an overflow mask */}
-          <div className="flex overflow-hidden pb-2">
-            {letters.map((l, i) => (
-              <motion.span
-                key={i}
-                className="text-[18vw] leading-none text-[#1A1611] sm:text-[9rem]"
-                style={{ fontFamily: SERIF, fontWeight: 600 }}
-                initial={{ y: "110%" }}
-                animate={{ y: 0 }}
-                transition={{ delay: 0.15 + i * 0.09, duration: 0.85, ease: EASE }}
-              >
-                {l}
-              </motion.span>
-            ))}
-          </div>
-
-          {/* terracotta hairline draws across */}
-          <motion.div
-            className="mt-6 h-px w-44 origin-left bg-[#C28773] sm:w-64"
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ delay: 0.8, duration: 1.0, ease: EASE }}
-          />
-
-          {/* tagline */}
           <motion.p
-            className="font-mm mt-5 text-sm text-[#1A1611]/55"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.15, duration: 0.7 }}
+            transition={{ delay: 0.5, duration: 0.4 }}
+            className="mt-3 font-mm text-[12px] text-k-ink/45"
           >
             ချစ်စရာ ဝတ်စုံလေးများ
           </motion.p>

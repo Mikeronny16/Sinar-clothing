@@ -8,6 +8,7 @@ import ProductDetail from "./pages/ProductDetail"
 import AboutPage from "./pages/AboutPage"
 import Film from "./pages/Film"
 import HomeClassic from "./pages/HomeClassic"
+import HomeFilm from "./pages/HomeFilm"
 import Saved from "./pages/Saved"
 import Portfolio from "./pages/Portfolio"
 import Auth from "./pages/Auth"
@@ -43,9 +44,9 @@ export default function App() {
             <CartProvider>
               <BrowserRouter>
                 <Toaster
-                  position="bottom-center"
+                  position="top-center"
                   toastOptions={{
-                    style: { background: "#1A1611", border: "1px solid #C28773", color: "#F3EEE4" },
+                    style: { background: "#1F3D2B", border: "none", color: "#fff", borderRadius: 16, fontFamily: "'Noto Sans Myanmar', Inter, sans-serif" },
                   }}
                 />
                 <IntroLoader />
@@ -60,6 +61,7 @@ export default function App() {
                   <Route path="/about" element={<AboutPage />} />
                   <Route path="/film" element={<Film />} />
                   <Route path="/classic" element={<HomeClassic />} />
+                  <Route path="/story" element={<HomeFilm />} />
                   <Route path="/saved" element={<Saved />} />
                   <Route path="/portfolio" element={<Portfolio />} />
                   <Route path="/boutique" element={<Suspense fallback={<div className="fixed inset-0 z-[65] bg-[#1b2a20]" />}><Boutique /></Suspense>} />
